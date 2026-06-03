@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
 
 <meta charset="UTF-8">
@@ -13,14 +12,8 @@
 <style>
 
 body{
-    background:#f5f7fb;
+    background:#f4f6fb;
     font-family:Segoe UI,sans-serif;
-}
-
-.card{
-    border:none;
-    border-radius:18px;
-    box-shadow:0 10px 30px rgba(0,0,0,.08);
 }
 
 .rtc-title{
@@ -29,14 +22,15 @@ body{
     font-weight:800;
 }
 
-.summary-panel{
-    position:sticky;
-    top:20px;
+.card{
+    border:none;
+    border-radius:16px;
+    box-shadow:0 10px 30px rgba(0,0,0,.08);
 }
 
-.table thead{
-    background:#0d6efd;
-    color:white;
+.summary-panel{
+    position:sticky;
+    top:15px;
 }
 
 .table th{
@@ -44,21 +38,13 @@ body{
     font-size:.9rem;
 }
 
-.table td{
-    vertical-align:middle;
-}
-
-.form-control{
-    min-width:90px;
-}
-
 .readonly{
     background:#f8fafc !important;
 }
 
 .metric{
-    padding:10px 0;
     border-bottom:1px solid #eee;
+    padding:10px 0;
 }
 
 .metric:last-child{
@@ -66,7 +52,7 @@ body{
 }
 
 .metric-value{
-    font-size:1.25rem;
+    font-size:1.15rem;
     font-weight:700;
 }
 
@@ -74,7 +60,6 @@ body{
 
     .summary-panel{
         position:relative;
-        top:auto;
     }
 
 }
@@ -87,7 +72,7 @@ body{
 
 <div class="container-fluid py-4">
 
-<div class="d-flex justify-content-between align-items-center mb-4">
+<div class="d-flex justify-content-between align-items-center mb-3">
 
 <h2 class="rtc-title">
 RTC Cost Analysis
@@ -103,9 +88,9 @@ placeholder="How many rows?"
 style="width:180px;">
 
 <button
-    class="btn btn-primary"
-    onclick="createRows()">
-    Create Rows
+class="btn btn-primary"
+onclick="createRows()">
+Create Rows
 </button>
 
 <button
@@ -124,7 +109,7 @@ Delete All Rows
 
 </div>
 
-<div class="row g-3">
+<div class="row">
 
 <div class="col-lg-10">
 
@@ -134,9 +119,9 @@ Delete All Rows
 
 <div class="table-responsive">
 
-<table class="table align-middle">
+<table class="table table-bordered align-middle">
 
-<thead>
+<thead class="table-primary">
 
 <tr>
 
@@ -176,7 +161,7 @@ Delete All Rows
 
 <div class="card-body">
 
-<h5 class="mb-3">
+<h5>
 Summary
 </h5>
 
@@ -211,7 +196,7 @@ Summary
 <div class="metric">
 <small>Gross Margin</small>
 <div id="grossMargin" class="metric-value">
-0%
+0% (0%)
 </div>
 </div>
 
@@ -228,7 +213,7 @@ oninput="calculate()">
 
 </div>
 
-<div class="metric">
+    <div class="metric">
 
 <small>Other Expenses</small>
 
@@ -242,8 +227,7 @@ class="metric-value">
 
 </div>
 
-
-    <div class="metric">
+<div class="metric">
 
 <small>Net Profit</small>
 
@@ -265,7 +249,7 @@ class="metric-value">
 id="netMargin"
 class="metric-value">
 
-0%
+0% (0%)
 
 </div>
 
@@ -285,7 +269,7 @@ class="metric-value">
 
 function peso(value){
 
-    return Number(value).toLocaleString(
+    return Number(value || 0).toLocaleString(
         "en-PH",
         {
             minimumFractionDigits:2,
@@ -393,38 +377,40 @@ onclick="this.closest('tr').remove();calculate();">
 
 function createRows(){
 
-    const count =
-        parseInt(
-            document.getElementById('rowCount').value
-        );
+const count =
+parseInt(
+document.getElementById('rowCount').value
+);
 
-    if(
-        isNaN(count)
-        ||
-        count <= 0
-    ){
-        alert('Enter number of rows');
-        return;
-    }
+if(
+isNaN(count)
+||
+count <= 0
+){
+alert('Enter number of rows');
+return;
+}
 
-    for(let i = 0; i < count; i++){
+for(let i=0;i<count;i++){
 
-        addRow();
+addRow();
 
-    }
+}
 
-    document.getElementById('rowCount').value = '';
+document.getElementById('rowCount').value='';
 
-    calculate();
+calculate();
 
 }
 
 function deleteAllRows(){
 
-if(!confirm('Delete all rows?')){
-
+if(
+!confirm(
+'Delete all rows?'
+)
+){
 return;
-
 }
 
 document.getElementById('tableBody').innerHTML='';
@@ -433,7 +419,7 @@ calculate();
 
 }
 
-function calculate(){
+    function calculate(){
 
 let totalQty=0;
 let totalSelling=0;
@@ -535,7 +521,6 @@ row.querySelector('.profitPercent').value=
 profitPercent.toFixed(2)+'%';
 
 totalQty+=qty;
-
 totalSelling+=rowSelling;
 
 if(rowCost!==null){
@@ -548,7 +533,7 @@ totalProfit+=profit;
 
 });
 
-    document.getElementById('totalQty').innerText=
+document.getElementById('totalQty').innerText=
 totalQty;
 
 document.getElementById('totalSelling').innerText=
@@ -569,10 +554,13 @@ grossMargin=
 
 }
 
-document.getElementById('grossMargin').innerText =
-grossMargin.toFixed(2) +
-'% (' +
-Math.round(grossMargin) +
+document.getElementById('grossMargin').innerText=
+grossMargin.toFixed(2)
++
+'% ('
++
+Math.round(grossMargin)
++
 '%)';
 
 let expensePercent=
@@ -588,89 +576,115 @@ let netProfit=
 totalProfit-
 expenseAmount;
 
-let netMargin = 0;
-
-if(totalSelling > 0){
-
-    netMargin =
-        (netProfit / totalSelling) * 100;
-
-}
-
-let netMarginWithTax =
-    netMargin - 10;
-
 document.getElementById('expenseAmount').innerText=
 '₱'+peso(expenseAmount);
 
 document.getElementById('netProfit').innerText=
 '₱'+peso(netProfit);
 
-document.getElementById('netMargin').innerText =
-netMarginWithTax.toFixed(2) +
-'% (' +
-Math.round(netMarginWithTax) +
+let netMargin=0;
+
+if(totalSelling>0){
+
+netMargin=
+(netProfit/totalSelling)*100;
+
+}
+
+let netMarginWithTax=
+netMargin-10;
+
+document.getElementById('netMargin').innerText=
+netMarginWithTax.toFixed(2)
++
+'% ('
++
+Math.round(netMarginWithTax)
++
 '%)';
 
-document.addEventListener('keydown', function(e){
+}
 
-    if(e.key !== 'Enter') return;
 
-    const current = document.activeElement;
+    document.addEventListener(
+'keydown',
+function(e){
 
-    if(
-        !current.classList.contains('form-control')
-        ||
-        current.hasAttribute('readonly')
-    ){
-        return;
-    }
+if(e.key!=='Enter'){
+return;
+}
 
-    e.preventDefault();
+const current=
+document.activeElement;
 
-    const currentRow =
-        current.closest('tr');
+if(
+!current.classList.contains('form-control')
+||
+current.hasAttribute('readonly')
+){
+return;
+}
 
-    if(!currentRow) return;
+e.preventDefault();
 
-    const editableFields = [
-        'item',
-        'printing',
-        'selling',
-        'qty'
-    ];
+const currentRow=
+current.closest('tr');
 
-    let currentClass = null;
+if(!currentRow){
+return;
+}
 
-    editableFields.forEach(field => {
+const editableFields=[
+'item',
+'printing',
+'selling',
+'qty'
+];
 
-        if(current.classList.contains(field)){
-            currentClass = field;
-        }
+let currentField=null;
 
-    });
+editableFields.forEach(field=>{
 
-    if(!currentClass) return;
-
-    const nextRow =
-        currentRow.nextElementSibling;
-
-    if(!nextRow) return;
-
-    const target =
-        nextRow.querySelector(
-            '.' + currentClass
-        );
-
-    if(target){
-
-        target.focus();
-
-        target.select?.();
-
-    }
+if(
+current.classList.contains(field)
+){
+currentField=field;
+}
 
 });
+
+if(!currentField){
+return;
+}
+
+const nextRow=
+currentRow.nextElementSibling;
+
+if(!nextRow){
+return;
+}
+
+const target=
+nextRow.querySelector(
+'.'+currentField
+);
+
+if(target){
+
+target.focus();
+
+target.select?.();
+
+}
+
+}
+);
+
+window.onload=function(){
+
+addRow();
+
+};
 
 </script>
 
