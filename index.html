@@ -594,57 +594,65 @@ netMargin.toFixed(2)+'%';
 
 }
 
-document.addEventListener(
-'keydown',
-function(e){
+document.addEventListener('keydown', function(e){
 
-if(e.key!=='Enter'){
+    if(e.key !== 'Enter') return;
 
-return;
+    const current = document.activeElement;
 
-}
+    if(
+        !current.classList.contains('form-control')
+        ||
+        current.hasAttribute('readonly')
+    ){
+        return;
+    }
 
-const current=
-document.activeElement;
+    e.preventDefault();
 
-if(
-!current.classList.contains(
-'form-control'
-)
-){
+    const currentRow =
+        current.closest('tr');
 
-return;
+    if(!currentRow) return;
 
-}
+    const editableFields = [
+        'item',
+        'printing',
+        'selling',
+        'qty'
+    ];
 
-e.preventDefault();
+    let currentClass = null;
 
-const inputs=
-Array.from(
+    editableFields.forEach(field => {
 
-document.querySelectorAll(
+        if(current.classList.contains(field)){
+            currentClass = field;
+        }
 
-'#tableBody input.form-control:not([readonly])'
+    });
 
-)
+    if(!currentClass) return;
 
-);
+    const nextRow =
+        currentRow.nextElementSibling;
 
-const index=
-inputs.indexOf(current);
+    if(!nextRow) return;
 
-if(
-index>-1
-&&
-index<inputs.length-1
-){
+    const target =
+        nextRow.querySelector(
+            '.' + currentClass
+        );
 
-inputs[index+1].focus();
+    if(target){
 
-}
+        target.focus();
 
-}
-);
+        target.select?.();
+
+    }
+
+});
 
 </script>
 
