@@ -558,8 +558,11 @@ grossMargin=
 
 }
 
-document.getElementById('grossMargin').innerText=
-grossMargin.toFixed(2)+'%';
+document.getElementById('grossMargin').innerText =
+grossMargin.toFixed(2) +
+'% (' +
+Math.round(grossMargin) +
+'%)';
 
 let expensePercent=
 parseFloat(
