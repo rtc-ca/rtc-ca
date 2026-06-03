@@ -259,7 +259,7 @@ class="metric-value">
 
 <div class="metric">
 
-<small>Net Margin</small>
+<small>Net Margin with Tax (10%)</small>
 
 <div
 id="netMargin"
@@ -577,14 +577,17 @@ let netProfit=
 totalProfit-
 expenseAmount;
 
-let netMargin=0;
+let netMargin = 0;
 
-if(totalSelling>0){
+if(totalSelling > 0){
 
-netMargin=
-(netProfit/totalSelling)*100;
+    netMargin =
+        (netProfit / totalSelling) * 100;
 
 }
+
+let netMarginWithTax =
+    netMargin - 10;
 
 document.getElementById('expenseAmount').innerText=
 '₱'+peso(expenseAmount);
@@ -592,10 +595,11 @@ document.getElementById('expenseAmount').innerText=
 document.getElementById('netProfit').innerText=
 '₱'+peso(netProfit);
 
-document.getElementById('netMargin').innerText=
-netMargin.toFixed(2)+'%';
-
-}
+document.getElementById('netMargin').innerText =
+netMarginWithTax.toFixed(2) +
+'% (' +
+Math.round(netMarginWithTax) +
+'%)';
 
 document.addEventListener('keydown', function(e){
 
