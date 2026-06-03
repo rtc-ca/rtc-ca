@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -12,6 +14,7 @@
 
 body{
     background:#f5f7fb;
+    font-family:Segoe UI,sans-serif;
 }
 
 .card{
@@ -38,6 +41,15 @@ body{
 
 .table th{
     white-space:nowrap;
+    font-size:.9rem;
+}
+
+.table td{
+    vertical-align:middle;
+}
+
+.form-control{
+    min-width:90px;
 }
 
 .readonly{
@@ -45,7 +57,7 @@ body{
 }
 
 .metric{
-    padding:12px 0;
+    padding:10px 0;
     border-bottom:1px solid #eee;
 }
 
@@ -54,7 +66,7 @@ body{
 }
 
 .metric-value{
-    font-size:1.4rem;
+    font-size:1.25rem;
     font-weight:700;
 }
 
@@ -75,170 +87,197 @@ body{
 
 <div class="container-fluid py-4">
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
+<div class="d-flex justify-content-between align-items-center mb-4">
 
-        <h2 class="rtc-title">
-            RTC Cost Analysis
-        </h2>
+<h2 class="rtc-title">
+RTC Cost Analysis
+</h2>
 
-        <div class="d-flex gap-2">
+<div class="d-flex gap-2">
 
-            <input
-                type="number"
-                id="rowCount"
-                class="form-control"
-                placeholder="How many rows?"
-                style="width:180px;">
+<input
+type="number"
+id="rowCount"
+class="form-control"
+placeholder="How many rows?"
+style="width:180px;">
 
-            <button
-                class="btn btn-primary"
-                onclick="createRows()">
-                Create Rows
-            </button>
+<button
+class="btn btn-primary"
+onclick="createRows()">
+Create Rows
+</button>
 
-            <button
-                class="btn btn-success"
-                onclick="addRow()">
-                + Add Row
-            </button>
+<button
+class="btn btn-success"
+onclick="addRow()">
++ Add Row
+</button>
 
-            <button
-                class="btn btn-danger"
-                onclick="deleteAllRows()">
-                Delete All Rows
-            </button>
+<button
+class="btn btn-danger"
+onclick="deleteAllRows()">
+Delete All Rows
+</button>
 
-        </div>
+</div>
 
-    </div>
+</div>
 
-    <div class="row g-4">
+<div class="row g-3">
 
-        <div class="col-lg-9">
+<div class="col-lg-10">
 
-            <div class="card">
+<div class="card">
 
-                <div class="card-body">
+<div class="card-body">
 
-                    <div class="table-responsive">
+<div class="table-responsive">
 
-                        <table class="table align-middle">
+<table class="table align-middle">
 
-                            <thead>
+<thead>
 
-                                <tr>
-                                    <th>Item</th>
-                                    <th>Printing</th>
-                                    <th>Cost</th>
-                                    <th>Mark Up</th>
-                                    <th>Selling</th>
-                                    <th>Quantity</th>
-                                    <th>Total Selling</th>
-                                    <th>Total Cost</th>
-                                    <th>Profit</th>
-                                    <th></th>
-                                </tr>
+<tr>
 
-                            </thead>
+<th>Item</th>
+<th>Printing</th>
+<th>Cost</th>
+<th>Mark Up</th>
+<th>Selling</th>
+<th>Qty</th>
+<th>Total Selling</th>
+<th>Total Cost</th>
+<th>Profit</th>
+<th>Profit %</th>
+<th></th>
 
-                            <tbody id="tableBody">
+</tr>
 
-                            </tbody>
+</thead>
 
-                        </table>
+<tbody id="tableBody">
 
-                    </div>
+</tbody>
 
-                </div>
+</table>
 
-            </div>
+</div>
 
-        </div>
+</div>
 
-        <div class="col-lg-3">
+</div>
 
-            <div class="card summary-panel">
+</div>
 
-                <div class="card-body">
+<div class="col-lg-2">
 
-                    <h4>Summary</h4>
+<div class="card summary-panel">
 
-                    <div class="metric">
-                        <small>Total Quantity</small>
-                        <div id="totalQty" class="metric-value">
-                            
-                        </div>
-                    </div>
+<div class="card-body">
 
-                    <div class="metric">
-                        <small>Total Selling</small>
-                        <div id="totalSelling" class="metric-value">
-                            ₱0.00
-                        </div>
-                    </div>
+<h5 class="mb-3">
+Summary
+</h5>
 
-                    <div class="metric">
-                        <small>Total Cost</small>
-                        <div id="totalCost" class="metric-value">
-                            ₱0.00
-                        </div>
-                    </div>
+<div class="metric">
+<small>Total Qty</small>
+<div id="totalQty" class="metric-value">
+0
+</div>
+</div>
 
-                    <div class="metric">
-                        <small>Gross Profit</small>
-                        <div id="grossProfit" class="metric-value">
-                            ₱0.00
-                        </div>
-                    </div>
+<div class="metric">
+<small>Total Selling</small>
+<div id="totalSelling" class="metric-value">
+₱0.00
+</div>
+</div>
 
-                    <div class="metric">
-                        <small>Gross Margin</small>
-                        <div id="grossMargin" class="metric-value">
-                            0%
-                        </div>
-                    </div>
+<div class="metric">
+<small>Total Cost</small>
+<div id="totalCost" class="metric-value">
+₱0.00
+</div>
+</div>
 
-                    <div class="metric">
+<div class="metric">
+<small>Gross Profit</small>
+<div id="grossProfit" class="metric-value">
+₱0.00
+</div>
+</div>
 
-                        <small>Other Expenses (%)</small>
+<div class="metric">
+<small>Gross Margin</small>
+<div id="grossMargin" class="metric-value">
+0%
+</div>
+</div>
 
-                        <input
-                            type="number"
-                            id="expensePercent"
-                            class="form-control mt-2"
-                            placeholder="Enter %"
-                            oninput="calculate()">
+<div class="metric">
 
-                    </div>
+<small>Other Expenses (%)</small>
 
-                    <div class="metric">
-                        <small>Other Expenses Amount</small>
-                        <div id="expenseAmount" class="metric-value">
-                            ₱0.00
-                        </div>
-                    </div>
+<input
+type="number"
+id="expensePercent"
+class="form-control mt-2"
+placeholder="Enter %"
+oninput="calculate()">
 
-                    <div class="metric">
-                        <small>Net Profit</small>
-                        <div id="netProfit" class="metric-value">
-                            ₱0.00
-                        </div>
-                    </div>
+</div>
 
-                    <div class="metric">
-                        <small>Net Margin</small>
-                        <div id="netMargin" class="metric-value">
-                            0%
-                        </div>
-                    </div>
+<div class="metric">
 
-                                  </div>
+<small>Other Expenses</small>
 
-            </div>
+<div
+id="expenseAmount"
+class="metric-value">
 
-        </div>
+₱0.00
 
-    </div>
+</div>
+
+</div>
+
+
+    <div class="metric">
+
+<small>Net Profit</small>
+
+<div
+id="netProfit"
+class="metric-value">
+
+₱0.00
+
+</div>
+
+</div>
+
+<div class="metric">
+
+<small>Net Margin</small>
+
+<div
+id="netMargin"
+class="metric-value">
+
+0%
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
 
 </div>
 
@@ -258,82 +297,92 @@ function peso(value){
 
 function addRow(){
 
-    document
-        .getElementById('tableBody')
-        .insertAdjacentHTML('beforeend',`
+document
+.getElementById('tableBody')
+.insertAdjacentHTML('beforeend',`
 
 <tr>
 
 <td>
-    <input
-        type="number"
-        class="form-control item"
-        oninput="calculate()">
+<input
+type="number"
+class="form-control item"
+oninput="calculate()">
 </td>
 
 <td>
-    <input
-        type="number"
-        class="form-control printing"
-        oninput="calculate()">
+<input
+type="number"
+class="form-control printing"
+oninput="calculate()">
 </td>
 
 <td>
-    <input
-        type="text"
-        class="form-control readonly cost"
-        readonly>
+<input
+type="text"
+class="form-control readonly cost"
+readonly>
 </td>
 
 <td>
-    <input
-        type="text"
-        class="form-control readonly markup"
-        readonly>
+<input
+type="text"
+class="form-control readonly markup"
+readonly>
 </td>
 
 <td>
-    <input
-        type="number"
-        class="form-control selling"
-        oninput="calculate()">
+<input
+type="number"
+class="form-control selling"
+oninput="calculate()">
 </td>
 
 <td>
-    <input
-        type="number"
-        class="form-control qty"
-        value=""
-        oninput="calculate()">
+<input
+type="number"
+class="form-control qty"
+oninput="calculate()">
 </td>
 
 <td>
-    <input
-        type="text"
-        class="form-control readonly totalSelling"
-        readonly>
+<input
+type="text"
+class="form-control readonly totalSelling"
+readonly>
 </td>
 
 <td>
-    <input
-        type="text"
-        class="form-control readonly totalCost"
-        readonly>
+<input
+type="text"
+class="form-control readonly totalCost"
+readonly>
 </td>
 
 <td>
-    <input
-        type="text"
-        class="form-control readonly profit"
-        readonly>
+<input
+type="text"
+class="form-control readonly profit"
+readonly>
 </td>
 
 <td>
-    <button
-        class="btn btn-danger btn-sm"
-        onclick="this.closest('tr').remove(); calculate();">
-        ×
-    </button>
+<input
+type="text"
+class="form-control readonly profitPercent"
+readonly>
+</td>
+
+<td>
+
+<button
+class="btn btn-danger btn-sm"
+onclick="this.closest('tr').remove();calculate();">
+
+×
+
+</button>
+
 </td>
 
 </tr>
@@ -344,186 +393,258 @@ function addRow(){
 
 function createRows(){
 
-    let count =
-        parseInt(
-            document.getElementById('rowCount').value
-        ) || 0;
+let count =
+parseInt(
+document.getElementById('rowCount').value
+) || 0;
 
-    for(let i = 0; i < count; i++){
+for(let i=0;i<count;i++){
 
-        addRow();
+addRow();
 
-    }
+}
 
-    document.getElementById('rowCount').value = '';
+document.getElementById('rowCount').value='';
 
 }
 
 function deleteAllRows(){
 
-    if(!confirm('Delete all rows?')){
-        return;
-    }
+if(!confirm('Delete all rows?')){
 
-    document.getElementById('tableBody').innerHTML = '';
+return;
 
-    calculate();
+}
+
+document.getElementById('tableBody').innerHTML='';
+
+calculate();
 
 }
 
 function calculate(){
 
-    let totalQty = 0;
-    let totalSelling = 0;
-    let totalCost = 0;
-    let totalProfit = 0;
+let totalQty=0;
+let totalSelling=0;
+let totalCost=0;
+let totalProfit=0;
 
-    document
-        .querySelectorAll('#tableBody tr')
-        .forEach(row => {
+document
+.querySelectorAll('#tableBody tr')
+.forEach(row=>{
 
-        let item =
-            parseFloat(
-                row.querySelector('.item').value
-            );
+let item=
+parseFloat(
+row.querySelector('.item').value
+);
 
-        let printing =
-            parseFloat(
-                row.querySelector('.printing').value
-            );
+let printing=
+parseFloat(
+row.querySelector('.printing').value
+);
 
-        let selling =
-            parseFloat(
-                row.querySelector('.selling').value
-            ) || 0;
+let selling=
+parseFloat(
+row.querySelector('.selling').value
+) || 0;
 
-        let qty =
-            parseFloat(
-                row.querySelector('.qty').value
-            ) || ;
+let qty=
+parseFloat(
+row.querySelector('.qty').value
+) || 0;
 
-        let cost = null;
+let cost=null;
 
-        if(!isNaN(item) || !isNaN(printing)){
+if(
+!isNaN(item)
+||
+!isNaN(printing)
+){
 
-            cost =
-                (isNaN(item) ? 0 : item)
-                +
-                (isNaN(printing) ? 0 : printing);
+cost=
+(isNaN(item)?0:item)
++
+(isNaN(printing)?0:printing);
 
-            row.querySelector('.cost').value =
-                peso(cost);
+row.querySelector('.cost').value=
+peso(cost);
 
-            row.querySelector('.markup').value =
-                peso(cost * 1.4);
+row.querySelector('.markup').value=
+peso(cost*1.4);
 
-        }else{
+}else{
 
-            row.querySelector('.cost').value = '';
-            row.querySelector('.markup').value = '';
-
-        }
-
-        let rowSelling =
-            selling * qty;
-
-        row.querySelector('.totalSelling').value =
-            peso(rowSelling);
-
-        let rowCost = null;
-
-        if(cost !== null){
-
-            rowCost =
-                cost * qty;
-
-            row.querySelector('.totalCost').value =
-                peso(rowCost);
-
-        }else{
-
-            row.querySelector('.totalCost').value =
-                '';
-
-        }
-
-        let profit =
-            rowCost !== null
-            ? rowSelling - rowCost
-            : rowSelling;
-
-        row.querySelector('.profit').value =
-            peso(profit);
-
-        totalQty += qty;
-        totalSelling += rowSelling;
-
-        if(rowCost !== null){
-
-            totalCost += rowCost;
-
-        }
-
-        totalProfit += profit;
-
-    });
-
-    document.getElementById('totalQty').innerText =
-        totalQty;
-
-    document.getElementById('totalSelling').innerText =
-        '₱' + peso(totalSelling);
-
-    document.getElementById('totalCost').innerText =
-        '₱' + peso(totalCost);
-
-    document.getElementById('grossProfit').innerText =
-        '₱' + peso(totalProfit);
-
-    let grossMargin = 0;
-
-    if(totalSelling > 0){
-
-        grossMargin =
-            (totalProfit / totalSelling) * 100;
-
-    }
-
-    document.getElementById('grossMargin').innerText =
-        grossMargin.toFixed(2) + '%';
-
-    let expensePercent =
-        parseFloat(
-            document.getElementById('expensePercent').value
-        ) || 0;
-
-    let expenseAmount =
-        totalSelling *
-        (expensePercent / 100);
-
-    let netProfit =
-        totalProfit -
-        expenseAmount;
-
-    let netMargin = 0;
-
-    if(totalSelling > 0){
-
-        netMargin =
-            (netProfit / totalSelling) * 100;
-
-    }
-
-    document.getElementById('expenseAmount').innerText =
-        '₱' + peso(expenseAmount);
-
-    document.getElementById('netProfit').innerText =
-        '₱' + peso(netProfit);
-
-    document.getElementById('netMargin').innerText =
-        netMargin.toFixed(2) + '%';
+row.querySelector('.cost').value='';
+row.querySelector('.markup').value='';
 
 }
+
+let rowSelling=
+selling*qty;
+
+row.querySelector('.totalSelling').value=
+peso(rowSelling);
+
+let rowCost=null;
+
+if(cost!==null){
+
+rowCost=
+cost*qty;
+
+row.querySelector('.totalCost').value=
+peso(rowCost);
+
+}else{
+
+row.querySelector('.totalCost').value='';
+
+}
+
+let profit=
+rowCost!==null
+?
+rowSelling-rowCost
+:
+rowSelling;
+
+row.querySelector('.profit').value=
+peso(profit);
+
+let profitPercent=0;
+
+if(rowSelling>0){
+
+profitPercent=
+(profit/rowSelling)*100;
+
+}
+
+row.querySelector('.profitPercent').value=
+profitPercent.toFixed(2)+'%';
+
+totalQty+=qty;
+
+totalSelling+=rowSelling;
+
+if(rowCost!==null){
+
+totalCost+=rowCost;
+
+}
+
+totalProfit+=profit;
+
+});
+
+    document.getElementById('totalQty').innerText=
+totalQty;
+
+document.getElementById('totalSelling').innerText=
+'₱'+peso(totalSelling);
+
+document.getElementById('totalCost').innerText=
+'₱'+peso(totalCost);
+
+document.getElementById('grossProfit').innerText=
+'₱'+peso(totalProfit);
+
+let grossMargin=0;
+
+if(totalSelling>0){
+
+grossMargin=
+(totalProfit/totalSelling)*100;
+
+}
+
+document.getElementById('grossMargin').innerText=
+grossMargin.toFixed(2)+'%';
+
+let expensePercent=
+parseFloat(
+document.getElementById('expensePercent').value
+) || 0;
+
+let expenseAmount=
+totalSelling*
+(expensePercent/100);
+
+let netProfit=
+totalProfit-
+expenseAmount;
+
+let netMargin=0;
+
+if(totalSelling>0){
+
+netMargin=
+(netProfit/totalSelling)*100;
+
+}
+
+document.getElementById('expenseAmount').innerText=
+'₱'+peso(expenseAmount);
+
+document.getElementById('netProfit').innerText=
+'₱'+peso(netProfit);
+
+document.getElementById('netMargin').innerText=
+netMargin.toFixed(2)+'%';
+
+}
+
+document.addEventListener(
+'keydown',
+function(e){
+
+if(e.key!=='Enter'){
+
+return;
+
+}
+
+const current=
+document.activeElement;
+
+if(
+!current.classList.contains(
+'form-control'
+)
+){
+
+return;
+
+}
+
+e.preventDefault();
+
+const inputs=
+Array.from(
+
+document.querySelectorAll(
+
+'#tableBody input.form-control:not([readonly])'
+
+)
+
+);
+
+const index=
+inputs.indexOf(current);
+
+if(
+index>-1
+&&
+index<inputs.length-1
+){
+
+inputs[index+1].focus();
+
+}
+
+}
+);
 
 </script>
 
