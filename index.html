@@ -103,9 +103,9 @@ placeholder="How many rows?"
 style="width:180px;">
 
 <button
-class="btn btn-primary"
-onclick="createRows()">
-Create Rows
+    class="btn btn-primary"
+    onclick="createRows()">
+    Create Rows
 </button>
 
 <button
@@ -393,18 +393,29 @@ onclick="this.closest('tr').remove();calculate();">
 
 function createRows(){
 
-let count =
-parseInt(
-document.getElementById('rowCount').value
-) || 0;
+    const count =
+        parseInt(
+            document.getElementById('rowCount').value
+        );
 
-for(let i=0;i<count;i++){
+    if(
+        isNaN(count)
+        ||
+        count <= 0
+    ){
+        alert('Enter number of rows');
+        return;
+    }
 
-addRow();
+    for(let i = 0; i < count; i++){
 
-}
+        addRow();
 
-document.getElementById('rowCount').value='';
+    }
+
+    document.getElementById('rowCount').value = '';
+
+    calculate();
 
 }
 
