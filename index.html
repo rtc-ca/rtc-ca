@@ -166,7 +166,7 @@ body{
                     <div class="metric">
                         <small>Total Quantity</small>
                         <div id="totalQty" class="metric-value">
-                            0
+                            
                         </div>
                     </div>
 
@@ -303,7 +303,7 @@ function addRow(){
     <input
         type="number"
         class="form-control qty"
-        value="0"
+        value=""
         oninput="calculate()">
 </td>
 
@@ -400,7 +400,7 @@ function calculate(){
         let qty =
             parseFloat(
                 row.querySelector('.qty').value
-            ) || 0;
+            ) || ;
 
         let cost = null;
 
