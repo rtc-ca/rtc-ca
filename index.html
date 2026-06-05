@@ -1,692 +1,703 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>RTC Cost Analysis</title>
-
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
+:root {
+  --maroon:#7b0d0d; --maroon-light:#a01515; --maroon-pale:#fdf3f3;
+  --dark:#1a1a2e; --gray:#6b7280; --border:#e5e7eb; --bg:#f7f8fc; --white:#ffffff;
+}
+*{box-sizing:border-box;}
+body{background:var(--bg);font-family:'DM Sans',sans-serif;color:var(--dark);font-size:.875rem;margin:0;}
 
-body{
-    background:#f4f6fb;
-    font-family:Segoe UI,sans-serif;
+/* HEADER */
+.app-header{background:var(--white);border-bottom:3px solid var(--maroon);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 10px rgba(123,13,13,.08);}
+.rtc-title{font-family:'Playfair Display',serif;color:var(--maroon);font-size:1.5rem;font-weight:900;margin:0;}
+
+/* DOC INFO */
+.doc-info-card{background:var(--white);border:1px solid var(--border);border-left:4px solid var(--maroon);border-radius:8px;padding:14px 20px;margin-bottom:16px;box-shadow:0 1px 6px rgba(0,0,0,.04);}
+.doc-info-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px 18px;}
+.doc-field label{font-size:.68rem;font-weight:600;color:var(--maroon);text-transform:uppercase;letter-spacing:.7px;display:block;margin-bottom:2px;}
+.doc-field input{border:none;border-bottom:1.5px solid var(--border);padding:3px 2px;font-size:.85rem;width:100%;background:transparent;color:var(--dark);outline:none;transition:border-color .2s;}
+.doc-field input:focus{border-bottom-color:var(--maroon);}
+
+/* SECTION LABEL */
+.section-label{font-family:'Playfair Display',serif;font-size:.95rem;font-weight:700;color:var(--maroon);border-bottom:2px solid var(--maroon-pale);padding-bottom:5px;margin-bottom:12px;}
+
+/* MAIN CARD */
+.main-card{background:var(--white);border:1px solid var(--border);border-radius:10px;box-shadow:0 2px 10px rgba(0,0,0,.05);}
+.main-card .card-body{padding:16px;}
+
+/* TABLE */
+.table-responsive{overflow-x:auto;}
+table.cost-table{width:100%;border-collapse:collapse;font-size:.78rem;}
+.cost-table thead tr th{background:var(--maroon);color:#fff;font-weight:600;padding:8px 6px;text-align:center;white-space:nowrap;font-size:.72rem;letter-spacing:.2px;border:1px solid #6b0000;}
+.cost-table tbody tr:hover{background:var(--maroon-pale);}
+.cost-table tbody td{padding:4px 4px;border-bottom:1px solid var(--border);border-right:1px solid #f0f0f0;vertical-align:middle;}
+.cost-table input[type="text"],.cost-table input[type="number"]{border:1px solid transparent;border-radius:4px;padding:4px 5px;width:100%;font-size:.78rem;background:transparent;transition:border-color .15s,background .15s;min-width:55px;}
+.cost-table input:focus{outline:none;border-color:var(--maroon);background:#fff;}
+.cost-table input.readonly{background:#f8fafc;color:var(--gray);cursor:default;}
+
+/* SUPPLIER TEXTAREA */
+.cost-table textarea.supplier-name{
+  border:1px solid transparent;border-radius:4px;padding:4px 5px;
+  width:100%;font-size:.78rem;background:transparent;
+  transition:border-color .15s,background .15s;
+  min-width:130px;resize:none;overflow:hidden;
+  font-family:'DM Sans',sans-serif;line-height:1.4;
+  min-height:32px;vertical-align:top;
+}
+.cost-table textarea.supplier-name:focus{outline:none;border-color:var(--maroon);background:#fff;}
+
+/* IMAGE CELL */
+.img-cell{text-align:center;width:82px;min-width:82px;}
+.img-upload-btn{
+  width:72px;height:72px;border:2px dashed #d1d5db;border-radius:6px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;font-size:.58rem;color:#9ca3af;
+  overflow:hidden;background:#fafafa;margin:0 auto;position:relative;flex-shrink:0;transition:border-color .2s;
+}
+.img-upload-btn:hover{border-color:var(--maroon);background:var(--maroon-pale);color:var(--maroon);}
+.img-upload-btn img{width:100%;height:100%;object-fit:cover;border-radius:4px;position:absolute;inset:0;display:none;}
+.img-upload-btn.has-img img{display:block;}
+.img-upload-btn.has-img .upload-label{display:none;}
+.img-upload-btn input[type="file"]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;z-index:2;}
+
+/* SUMMARY PANEL */
+.summary-panel{position:sticky;top:10px;background:var(--white);border:1px solid var(--border);border-radius:10px;box-shadow:0 3px 14px rgba(123,13,13,.07);overflow:hidden;font-size:.8rem;}
+.summary-header{background:var(--maroon);color:#fff;padding:10px 14px;font-family:'Playfair Display',serif;font-weight:700;font-size:.9rem;}
+.summary-body{padding:0 14px 10px;}
+.metric{padding:6px 0;border-bottom:1px solid #f0f0f0;display:flex;justify-content:space-between;align-items:center;gap:6px;}
+.metric:last-child{border-bottom:none;}
+.metric small{font-size:.66rem;font-weight:600;color:var(--gray);text-transform:uppercase;letter-spacing:.5px;flex-shrink:0;}
+.metric-value{font-size:.88rem;font-weight:700;color:var(--dark);text-align:right;}
+.metric-value.profit{color:#166534;} .metric-value.loss{color:#991b1b;} .metric-value.gold{color:#b07d27;}
+
+/* EWT TOGGLE */
+.ewt-toggle-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #f0f0f0;}
+.ewt-toggle-row small{font-size:.66rem;font-weight:600;color:var(--gray);text-transform:uppercase;letter-spacing:.5px;}
+.ewt-inputs{display:flex;align-items:center;gap:5px;margin-top:4px;}
+.ewt-inputs input[type="number"]{border:1px solid var(--border);border-radius:5px;padding:3px 6px;font-size:.76rem;width:60px;outline:none;text-align:right;}
+.ewt-inputs input:focus{border-color:var(--maroon);}
+
+/* GOODS BREAKDOWN */
+.goods-card{background:var(--white);border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin-top:14px;box-shadow:0 1px 6px rgba(0,0,0,.04);}
+.goods-table{width:100%;border-collapse:collapse;font-size:.78rem;margin-top:8px;}
+.goods-table thead tr th{background:#4b0505;color:#fff;font-weight:600;padding:7px 8px;text-align:center;font-size:.72rem;border:1px solid #3a0404;}
+.goods-table tbody td{padding:4px 6px;border-bottom:1px solid var(--border);vertical-align:middle;}
+.goods-table input[type="text"],.goods-table input[type="number"]{border:1px solid transparent;border-radius:4px;padding:4px 6px;width:100%;font-size:.78rem;background:transparent;transition:border-color .15s;}
+.goods-table input:focus{outline:none;border-color:var(--maroon);background:#fff;}
+.goods-table input.readonly{background:#f8fafc;color:var(--gray);cursor:default;}
+.goods-total-row td{font-weight:700;background:#fdf3f3;padding:6px 8px;font-size:.78rem;}
+.ewt-row td{color:#c0392b;font-size:.72rem;padding:3px 8px;font-style:italic;}
+
+/* SIGNATURE */
+.sig-section{background:var(--white);border:1px solid var(--border);border-radius:8px;padding:20px 24px 16px;margin-top:14px;box-shadow:0 1px 6px rgba(0,0,0,.04);}
+.sig-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:8px;}
+.sig-block{text-align:center;}
+.sig-space{height:50px;border-bottom:1.5px solid var(--dark);margin-bottom:6px;width:100%;}
+.sig-name{border:none;border-bottom:1px solid #aaa;text-align:center;font-size:.82rem;font-weight:600;width:100%;background:transparent;outline:none;padding:2px 4px;transition:border-color .2s;display:block;}
+.sig-name:focus{border-bottom-color:var(--maroon);}
+.sig-role{font-size:.68rem;color:var(--gray);text-transform:uppercase;letter-spacing:.6px;margin-top:4px;display:block;}
+
+/* BUTTONS */
+.btn-maroon{background:var(--maroon);color:#fff;border:none;border-radius:7px;padding:7px 14px;font-size:.8rem;font-weight:600;cursor:pointer;transition:background .2s;}
+.btn-maroon:hover{background:var(--maroon-light);}
+.btn-outline-maroon{background:transparent;color:var(--maroon);border:1.5px solid var(--maroon);border-radius:7px;padding:6px 12px;font-size:.8rem;font-weight:600;cursor:pointer;transition:all .2s;}
+.btn-outline-maroon:hover{background:var(--maroon);color:#fff;}
+.btn-danger-sm{background:#fee2e2;color:#991b1b;border:none;border-radius:5px;padding:4px 8px;font-size:.76rem;cursor:pointer;font-weight:600;transition:background .2s;}
+.btn-danger-sm:hover{background:#fecaca;}
+
+/* TOOLBAR */
+.toolbar{display:flex;gap:7px;align-items:center;flex-wrap:wrap;margin-bottom:12px;}
+.toolbar input[type="number"]{border:1px solid var(--border);border-radius:7px;padding:6px 10px;font-size:.8rem;width:130px;outline:none;}
+.toolbar input:focus{border-color:var(--maroon);}
+
+/* ══ PRINT ══ */
+@media print {
+  @page { size:letter landscape; margin:1.2cm 1.4cm; }
+  *{-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important;}
+
+  body{background:#fff !important;font-size:8.5pt;}
+  .no-print,.app-header,.toolbar,#addGoodsBtn{display:none !important;}
+
+  /* full width, no sidebar — everything stacks naturally */
+  .container-fluid{padding:0 !important;}
+  .row{display:block !important;}
+  .col-lg-9,.col-lg-3{
+    width:100% !important;max-width:100% !important;
+    flex:none !important;padding:0 !important;
+  }
+
+  /* summary: horizontal strip, normal flow */
+  .summary-panel{
+    position:static !important;
+    box-shadow:none !important;
+    border:1px solid #ccc !important;
+    border-radius:0 !important;
+    margin-top:6pt !important;
+    page-break-inside:avoid;
+    break-inside:avoid;
+  }
+  .summary-header{padding:4pt 8pt !important;font-size:7.5pt !important;}
+  .summary-body{
+    display:grid !important;
+    grid-template-columns:repeat(6,1fr) !important;
+    padding:3pt 6pt !important;
+    gap:0 !important;
+  }
+  .metric{
+    flex-direction:column !important;align-items:flex-start !important;
+    padding:3pt 5pt !important;border-bottom:none !important;
+    border-right:1px solid #eee !important;gap:1pt !important;
+  }
+  .metric:last-child{border-right:none !important;}
+  .metric small{font-size:.56rem !important;}
+  .metric-value{font-size:.76rem !important;}
+  .metric input{display:none !important;}
+  .ewt-toggle-row{
+    flex-direction:column !important;align-items:flex-start !important;
+    padding:3pt 5pt !important;border-bottom:none !important;
+    border-right:1px solid #eee !important;
+  }
+  .ewt-inputs input[type="number"],.ewt-toggle-row button,#ewtOffState{display:none !important;}
+
+  /* cards */
+  .main-card,.goods-card,.doc-info-card{
+    box-shadow:none !important;border-radius:0 !important;
+  }
+  .main-card{border:1px solid #ccc !important;}
+  .main-card .card-body{padding:6pt !important;}
+  .doc-info-card{
+    border-radius:0 !important;margin-bottom:6pt !important;
+    padding:6pt 10pt !important;border:1px solid #ddd !important;
+  }
+
+  /* doc fields — hide if empty */
+  .doc-field input{font-size:8pt !important;border-bottom:none !important;padding:0 !important;}
+  .doc-field input:placeholder-shown{display:none !important;}
+
+  /* main table */
+  .cost-table{font-size:7pt !important;}
+  .cost-table thead tr th{padding:4pt 3pt !important;font-size:6.5pt !important;}
+  .cost-table tbody td{padding:2pt 2pt !important;}
+  .cost-table input[type="text"],
+  .cost-table input[type="number"]{
+    border:none !important;background:transparent !important;
+    padding:0 !important;font-size:7pt !important;min-width:0 !important;
+  }
+  .cost-table input:placeholder-shown{visibility:hidden;}
+  .cost-table textarea.supplier-name{
+    border:none !important;background:transparent !important;
+    padding:0 !important;font-size:7pt !important;
+    min-width:0 !important;resize:none !important;
+  }
+  .cost-table textarea:placeholder-shown{visibility:hidden;}
+  .profit-pct-main{font-size:7pt !important;}
+  .profit-pct-round{font-size:6.5pt !important;}
+
+  /* image */
+  .img-cell{width:50pt !important;min-width:50pt !important;}
+  .img-upload-btn{width:50pt !important;height:50pt !important;border:1px solid #ddd !important;}
+  .img-upload-btn input[type="file"]{display:none !important;}
+  .upload-label{display:none !important;}
+
+  /* goods */
+  .goods-card{
+    margin-top:6pt !important;padding:4pt 6pt !important;
+    border:1px solid #ccc !important;
+    page-break-inside:avoid;break-inside:avoid;
+  }
+  .goods-table{font-size:7pt !important;}
+  .goods-table input{border:none !important;background:transparent !important;font-size:7pt !important;}
+  .goods-table input:placeholder-shown{visibility:hidden;}
+
+  /* signature — normal flow after all content, no fixed */
+  .sig-section{
+    position:static !important;
+    margin-top:14pt !important;
+    border:none !important;
+    border-top:1.5px solid #7b0d0d !important;
+    padding:8pt 0 0 !important;
+    box-shadow:none !important;
+    background:#fff !important;
+    border-radius:0 !important;
+    page-break-inside:avoid;
+    break-inside:avoid;
+    break-before:avoid;
+  }
+  .sig-space{height:28pt !important;}
+  .sig-name:placeholder-shown{visibility:hidden !important;}
+  .sig-name{font-size:7.5pt !important;border-bottom:1px solid #999 !important;}
+  .sig-role{font-size:6.5pt !important;}
+  .section-label.sig-label{display:none !important;}
+  .section-label{font-size:8pt !important;margin-bottom:4pt !important;padding-bottom:2pt !important;}
 }
 
-.rtc-title{
-    color:#800000;
-    font-style:italic;
-    font-weight:800;
+@media (max-width:991px){
+  .summary-panel{position:relative;}
+  .sig-grid{grid-template-columns:repeat(2,1fr);}
 }
-
-.card{
-    border:none;
-    border-radius:16px;
-    box-shadow:0 10px 30px rgba(0,0,0,.08);
-}
-
-.summary-panel{
-    position:sticky;
-    top:15px;
-}
-
-.table th{
-    white-space:nowrap;
-    font-size:.9rem;
-}
-
-.readonly{
-    background:#f8fafc !important;
-}
-
-.metric{
-    border-bottom:1px solid #eee;
-    padding:10px 0;
-}
-
-.metric:last-child{
-    border-bottom:none;
-}
-
-.metric-value{
-    font-size:1.15rem;
-    font-weight:700;
-}
-
-@media(max-width:991px){
-
-    .summary-panel{
-        position:relative;
-    }
-
-}
-
 </style>
-
 </head>
-
 <body>
 
-<div class="container-fluid py-4">
-
-<div class="d-flex justify-content-between align-items-center mb-3">
-
-<h2 class="rtc-title">
-RTC Cost Analysis
-</h2>
-
-<div class="d-flex gap-2">
-
-<input
-type="number"
-id="rowCount"
-class="form-control"
-placeholder="How many rows?"
-style="width:180px;">
-
-<button
-class="btn btn-primary"
-onclick="createRows()">
-Create Rows
-</button>
-
-<button
-class="btn btn-success"
-onclick="addRow()">
-+ Add Row
-</button>
-
-<button
-class="btn btn-danger"
-onclick="deleteAllRows()">
-Delete All Rows
-</button>
-
+<div class="app-header no-print">
+  <div class="rtc-title">RTC Cost Analysis</div>
+  <div class="d-flex gap-2">
+    <button class="btn-maroon" onclick="window.print()">⬇ Export PDF</button>
+  </div>
 </div>
 
-</div>
+<div class="container-fluid py-3 px-3 px-md-4">
 
-<div class="row">
+  <!-- DOC INFO -->
+  <div class="doc-info-card">
+    <div class="doc-info-grid">
+      <div class="doc-field"><label>Date</label><input type="date" id="docDate"></div>
+      <div class="doc-field"><label>Client</label><input type="text" id="docClient" placeholder=" "></div>
+      <div class="doc-field"><label>Name of Project</label><input type="text" id="docProject" placeholder=" "></div>
+      <div class="doc-field"><label>Ref No.</label><input type="text" id="docRef" placeholder=" "></div>
+      <div class="doc-field"><label>Quotation Number</label><input type="text" id="docQuotation" placeholder=" "></div>
+    </div>
+  </div>
 
-<div class="col-lg-10">
+  <div class="row g-3">
 
-<div class="card">
+    <!-- LEFT -->
+    <div class="col-lg-9">
 
-<div class="card-body">
+      <!-- Items Table -->
+      <div class="main-card">
+        <div class="card-body">
+          <div class="toolbar no-print">
+            <input type="number" id="rowCount" placeholder="How many rows?" min="1">
+            <button class="btn-maroon" onclick="createRows()">Create Rows</button>
+            <button class="btn-outline-maroon" onclick="addRow()">+ Add Row</button>
+            <button class="btn-danger-sm" onclick="deleteAllRows()">Delete All</button>
+          </div>
+          <div class="section-label">Items / Supplier</div>
+          <div class="table-responsive">
+            <table class="cost-table">
+              <thead>
+                <tr>
+                  <th>Item / Supplier</th><th>Image</th><th>Cost</th><th>PDM</th>
+                  <th>Total Cost</th><th>Markup (40%)</th><th>Selling</th><th>Qty</th>
+                  <th>Total Selling</th><th>Total Cost Amt</th><th>Profit</th><th>Profit %</th>
+                  <th class="no-print"></th>
+                </tr>
+              </thead>
+              <tbody id="tableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
 
-<div class="table-responsive">
+      <!-- Goods Breakdown -->
+      <div id="goodsSection" style="display:none;">
+        <div class="goods-card">
+          <div class="d-flex justify-content-between align-items-center mb-1">
+            <div class="section-label mb-0">Goods Breakdown</div>
+            <div class="d-flex gap-2 no-print">
+              <button class="btn-outline-maroon" onclick="addGoodsRow()">+ Add Row</button>
+              <button class="btn-danger-sm" onclick="hideGoods()">✕ Remove</button>
+            </div>
+          </div>
+          <div class="table-responsive">
+            <table class="goods-table">
+              <thead>
+                <tr>
+                  <th style="width:42%">Item</th><th>Qty</th><th>Unit Cost</th><th>Total</th>
+                  <th class="no-print"></th>
+                </tr>
+              </thead>
+              <tbody id="goodsBody"></tbody>
+              <tfoot>
+                <tr class="ewt-row">
+                  <td colspan="3">NON-VAT EWT 1% (Assumed by RTC)</td>
+                  <td id="goodsEwt1"></td><td class="no-print"></td>
+                </tr>
+                <tr class="ewt-row">
+                  <td colspan="3">VATABLE EWT 1% (Assumed by RTC)</td>
+                  <td id="goodsEwtV1"></td><td class="no-print"></td>
+                </tr>
+                <tr class="goods-total-row">
+                  <td colspan="2">TOTAL COST</td>
+                  <td id="goodsTotalQty"></td><td id="goodsTotalCost"></td>
+                  <td class="no-print"></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+      </div>
 
-<table class="table table-bordered align-middle">
+      <div id="addGoodsBtn" class="mt-2 no-print">
+        <button class="btn-outline-maroon" onclick="showGoods()"
+          style="width:100%;padding:8px;border-style:dashed;font-size:.78rem;">
+          + Add Goods Breakdown
+        </button>
+      </div>
 
-<thead class="table-primary">
+    </div>
 
-<tr>
+    <!-- RIGHT: SUMMARY -->
+    <div class="col-lg-3">
+      <div class="summary-panel">
+        <div class="summary-header">Summary</div>
+        <div class="summary-body">
 
-<th>Cost</th>
-<th>PDM</th>
-<th>Total Cost</th>
-<th>Mark Up</th>
-<th>Selling</th>
-<th>Qty</th>
-<th>Total Selling</th>
-<th>Total Cost</th>
-<th>Profit</th>
-<th>Profit %</th>
-<th></th>
+          <div class="metric">
+            <small>Total Qty</small>
+            <div id="totalQty" class="metric-value">0</div>
+          </div>
+          <div class="metric">
+            <small>Total Selling</small>
+            <div id="totalSelling" class="metric-value">₱0.00</div>
+          </div>
+          <div class="metric">
+            <small>Total Expenses</small>
+            <div id="totalCost" class="metric-value">₱0.00</div>
+          </div>
+          <div class="metric">
+            <small>Gross Profit</small>
+            <div id="grossProfit" class="metric-value profit">₱0.00</div>
+          </div>
+          <div class="metric">
+            <small>Gross Margin</small>
+            <div id="grossMargin" class="metric-value">0%</div>
+          </div>
+          <div class="metric">
+            <small>Other Exp. (%)</small>
+            <input type="number" id="expensePercent"
+              style="border:1px solid var(--border);border-radius:5px;padding:3px 6px;font-size:.76rem;width:70px;outline:none;text-align:right;"
+              placeholder="0" oninput="calculate()">
+          </div>
+          <div class="metric">
+            <small>Other Expenses</small>
+            <div id="expenseAmount" class="metric-value">₱0.00</div>
+          </div>
+          <div class="metric">
+            <small>Net Profit</small>
+            <div id="netProfit" class="metric-value profit">₱0.00</div>
+          </div>
+          <div class="metric">
+            <small>Tax (10%)</small>
+            <div class="metric-value">10%</div>
+          </div>
+          <div class="metric">
+            <small>Net Margin</small>
+            <div id="netMargin" class="metric-value">0%</div>
+          </div>
 
-</tr>
+          <!-- EWT optional with custom % -->
+          <div class="ewt-toggle-row" id="ewtRow">
+            <small>EWT (by RTC)</small>
+            <div id="ewtOffState" style="display:flex;align-items:center;gap:6px;margin-top:4px;">
+              <span style="font-size:.76rem;color:#aaa;font-style:italic;">Not applied</span>
+              <button onclick="toggleEWT(true)"
+                style="background:var(--maroon);color:#fff;border:none;border-radius:4px;padding:2px 8px;font-size:.68rem;cursor:pointer;">
+                Apply
+              </button>
+            </div>
+            <div id="ewtOnState" style="display:none;width:100%;">
+              <div class="ewt-inputs" style="margin-top:4px;">
+                <input type="number" id="ewtPercent" value="1" min="0" max="100" step="0.1"
+                  style="width:55px;" oninput="calculate()">
+                <span style="font-size:.76rem;">%</span>
+                <div id="ewtValue" class="metric-value gold" style="flex:1;text-align:right;">—</div>
+                <button onclick="toggleEWT(false)"
+                  style="background:#fee2e2;color:#991b1b;border:none;border-radius:4px;padding:2px 6px;font-size:.68rem;cursor:pointer;">
+                  ✕
+                </button>
+              </div>
+            </div>
+          </div>
 
-</thead>
+        </div>
+      </div>
+    </div>
 
-<tbody id="tableBody">
+  </div>
 
-</tbody>
-
-</table>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-<div class="col-lg-2">
-
-<div class="card summary-panel">
-
-<div class="card-body">
-
-<h5>
-Summary
-</h5>
-
-<div class="metric">
-<small>Total Qty</small>
-<div id="totalQty" class="metric-value">
-0
-</div>
-</div>
-
-<div class="metric">
-<small>Total Selling</small>
-<div id="totalSelling" class="metric-value">
-₱0.00
-</div>
-</div>
-
-<div class="metric">
-<small>Total Cost</small>
-<div id="totalCost" class="metric-value">
-₱0.00
-</div>
-</div>
-
-<div class="metric">
-<small>Gross Profit</small>
-<div id="grossProfit" class="metric-value">
-₱0.00
-</div>
-</div>
-
-<div class="metric">
-<small>Gross Margin</small>
-<div id="grossMargin" class="metric-value">
-0% (0%)
-</div>
-</div>
-
-<div class="metric">
-
-<small>Other Expenses (%)</small>
-
-<input
-type="number"
-id="expensePercent"
-class="form-control mt-2"
-placeholder="Enter %"
-oninput="calculate()">
-
-</div>
-
-    <div class="metric">
-
-<small>Other Expenses</small>
-
-<div
-id="expenseAmount"
-class="metric-value">
-
-₱0.00
-
-</div>
-
-</div>
-
-<div class="metric">
-
-<small>Net Profit</small>
-
-<div
-id="netProfit"
-class="metric-value">
-
-₱0.00
-
-</div>
-
-</div>
-
-<div class="metric">
-
-<small>Net Margin with Tax (10%)</small>
-
-<div
-id="netMargin"
-class="metric-value">
-
-0% (0%)
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
+  <!-- SIGNATURE — always last, after summary -->
+  <div class="sig-section">
+    <div class="section-label sig-label">Authorized Signatories</div>
+    <div class="sig-grid">
+      <div class="sig-block">
+        <div class="sig-space"></div>
+        <input type="text" class="sig-name" id="sigName0" placeholder=" ">
+        <span class="sig-role">Prepared by</span>
+      </div>
+      <div class="sig-block">
+        <div class="sig-space"></div>
+        <input type="text" class="sig-name" id="sigName1" placeholder=" ">
+        <span class="sig-role">Noted by</span>
+      </div>
+      <div class="sig-block">
+        <div class="sig-space"></div>
+        <input type="text" class="sig-name" id="sigName2" placeholder=" ">
+        <span class="sig-role">Check by Acctg.</span>
+      </div>
+      <div class="sig-block">
+        <div class="sig-space"></div>
+        <input type="text" class="sig-name" id="sigName3" value="RAM MIRCH" placeholder=" ">
+        <span class="sig-role">Approved by — CSO</span>
+      </div>
+    </div>
+  </div>
 
 </div>
 
 <script>
+/* ── UTILS ── */
+function peso(v){return Number(v||0).toLocaleString('en-PH',{minimumFractionDigits:2,maximumFractionDigits:2});}
+function pParse(s){return parseFloat((s||'').toString().replace(/[₱,()]/g,''))||0;}
 
-function peso(value){
-
-    return Number(value || 0).toLocaleString(
-        "en-PH",
-        {
-            minimumFractionDigits:2,
-            maximumFractionDigits:2
-        }
-    );
-
+/* ── EWT TOGGLE ── */
+let ewtEnabled = false;
+function toggleEWT(on){
+  ewtEnabled = on;
+  document.getElementById('ewtOffState').style.display = on ? 'none' : 'flex';
+  document.getElementById('ewtOnState').style.display  = on ? 'block' : 'none';
+  calculate();
 }
 
+/* ── SELLING FORMAT (comma) ── */
+function formatSelling(input){
+  let raw = input.value.replace(/,/g,'');
+  if(raw === '' || isNaN(raw)) return;
+  input.dataset.raw = raw;
+  // show formatted while typing only on blur; store raw for calc
+}
+function onSellingInput(input){
+  input.dataset.raw = input.value.replace(/,/g,'');
+  calculate();
+}
+function onSellingBlur(input){
+  const raw = parseFloat(input.dataset.raw||input.value.replace(/,/g,''));
+  if(!isNaN(raw) && input.value !== ''){
+    input.value = raw.toLocaleString('en-PH',{minimumFractionDigits:0,maximumFractionDigits:2});
+  }
+}
+function onSellingFocus(input){
+  const raw = input.dataset.raw || input.value.replace(/,/g,'');
+  input.value = raw;
+}
+function getSellingVal(input){
+  return parseFloat((input.dataset.raw||input.value||'').replace(/,/g,''))||0;
+}
+
+/* ── AUTO-RESIZE TEXTAREA ── */
+function autoResize(el){
+  el.style.height = 'auto';
+  el.style.height = el.scrollHeight + 'px';
+}
+
+/* ── ADD ROW ── */
 function addRow(){
+  const tbody = document.getElementById('tableBody');
+  const tr = document.createElement('tr');
+  tr.innerHTML = `
+    <td style="vertical-align:top;padding-top:6px;">
+      <textarea class="supplier-name" rows="1" placeholder=" "
+        oninput="autoResize(this);calculate()"
+        onkeydown="handleSupplierKey(event)"></textarea>
+    </td>
+    <td class="img-cell">
+      <div class="img-upload-btn" title="Click to upload image">
+        <span class="upload-label" style="font-size:.58rem;text-align:center;line-height:1.3;padding:4px;">📷<br>Upload</span>
+        <img alt="item">
+        <input type="file" accept="image/*" onchange="loadItemImage(this)">
+      </div>
+    </td>
+    <td><input type="number" class="item" oninput="calculate()"></td>
+    <td><input type="number" class="printing" oninput="calculate()"></td>
+    <td><input type="text" class="readonly cost" readonly></td>
+    <td><input type="text" class="readonly markup" readonly></td>
+    <td><input type="text" class="selling" placeholder=" "
+      oninput="onSellingInput(this)"
+      onblur="onSellingBlur(this)"
+      onfocus="onSellingFocus(this)"></td>
+    <td><input type="number" class="qty" oninput="calculate()"></td>
+    <td><input type="text" class="readonly totalSelling" readonly></td>
+    <td><input type="text" class="readonly totalCostAmt" readonly></td>
+    <td><input type="text" class="readonly profit" readonly></td>
+    <td style="text-align:center;vertical-align:middle;">
+      <div class="profit-pct-main" style="font-size:.78rem;font-weight:600;color:var(--dark);line-height:1.3;"></div>
+      <div class="profit-pct-round" style="font-size:.7rem;color:var(--gray);line-height:1.2;"></div>
+    </td>
+    <td class="no-print">
+      <button class="btn-danger-sm" onclick="this.closest('tr').remove();calculate();">×</button>
+    </td>`;
+  tbody.appendChild(tr);
+}
 
-document
-.getElementById('tableBody')
-.insertAdjacentHTML('beforeend',`
+function handleSupplierKey(e){
+  if(e.key==='Enter' && !e.shiftKey){
+    e.preventDefault();
+    const row = e.target.closest('tr');
+    const next = row?.nextElementSibling;
+    if(next) next.querySelector('.supplier-name')?.focus();
+  }
+  // shift+enter = new line (default textarea behavior)
+}
 
-<tr>
-
-<td>
-<input
-type="number"
-class="form-control item"
-oninput="calculate()">
-</td>
-
-<td>
-<input
-type="number"
-class="form-control printing"
-oninput="calculate()">
-</td>
-
-<td>
-<input
-type="text"
-class="form-control readonly cost"
-readonly>
-</td>
-
-<td>
-<input
-type="text"
-class="form-control readonly markup"
-readonly>
-</td>
-
-<td>
-<input
-type="number"
-class="form-control selling"
-oninput="calculate()">
-</td>
-
-<td>
-<input
-type="number"
-class="form-control qty"
-oninput="calculate()">
-</td>
-
-<td>
-<input
-type="text"
-class="form-control readonly totalSelling"
-readonly>
-</td>
-
-<td>
-<input
-type="text"
-class="form-control readonly totalCost"
-readonly>
-</td>
-
-<td>
-<input
-type="text"
-class="form-control readonly profit"
-readonly>
-</td>
-
-<td>
-<input
-type="text"
-class="form-control readonly profitPercent"
-readonly>
-</td>
-
-<td>
-
-<button
-class="btn btn-danger btn-sm"
-onclick="this.closest('tr').remove();calculate();">
-
-×
-
-</button>
-
-</td>
-
-</tr>
-
-`);
-
+function loadItemImage(input){
+  if(!input.files||!input.files[0]) return;
+  const reader = new FileReader();
+  reader.onload = e=>{
+    const btn = input.closest('.img-upload-btn');
+    btn.querySelector('img').src = e.target.result;
+    btn.classList.add('has-img');
+  };
+  reader.readAsDataURL(input.files[0]);
 }
 
 function createRows(){
-
-const count =
-parseInt(
-document.getElementById('rowCount').value
-);
-
-if(
-isNaN(count)
-||
-count <= 0
-){
-alert('Enter number of rows');
-return;
-}
-
-for(let i=0;i<count;i++){
-
-addRow();
-
-}
-
-document.getElementById('rowCount').value='';
-
-calculate();
-
+  const n = parseInt(document.getElementById('rowCount').value);
+  if(isNaN(n)||n<=0){alert('Enter a valid number');return;}
+  for(let i=0;i<n;i++) addRow();
+  document.getElementById('rowCount').value='';
+  calculate();
 }
 
 function deleteAllRows(){
-
-if(
-!confirm(
-'Delete all rows?'
-)
-){
-return;
+  if(!confirm('Delete all rows?')) return;
+  document.getElementById('tableBody').innerHTML='';
+  calculate();
 }
 
-document.getElementById('tableBody').innerHTML='';
-
-calculate();
-
+/* ── GOODS BREAKDOWN ── */
+function showGoods(){
+  document.getElementById('goodsSection').style.display='block';
+  document.getElementById('addGoodsBtn').style.display='none';
+  if(!document.getElementById('goodsBody').children.length){
+    addGoodsRow();addGoodsRow();addGoodsRow();
+  }
+}
+function hideGoods(){
+  document.getElementById('goodsSection').style.display='none';
+  document.getElementById('addGoodsBtn').style.display='block';
+}
+function addGoodsRow(){
+  const tbody=document.getElementById('goodsBody');
+  const tr=document.createElement('tr');
+  tr.innerHTML=`
+    <td><input type="text" placeholder=" " style="min-width:140px;border:1px solid transparent;border-radius:4px;padding:4px 6px;width:100%;font-size:.78rem;background:transparent;"></td>
+    <td><input type="number" class="g-qty" oninput="calcGoods()" style="border:1px solid transparent;border-radius:4px;padding:4px 5px;width:100%;font-size:.78rem;background:transparent;"></td>
+    <td><input type="number" class="g-unit" oninput="calcGoods()" style="border:1px solid transparent;border-radius:4px;padding:4px 5px;width:100%;font-size:.78rem;background:transparent;"></td>
+    <td><input type="text" class="readonly g-total" readonly style="background:#f8fafc;border:none;padding:4px 5px;width:100%;font-size:.78rem;color:#6b7280;"></td>
+    <td class="no-print"><button class="btn-danger-sm" onclick="this.closest('tr').remove();calcGoods();">×</button></td>`;
+  tbody.appendChild(tr);
+}
+function calcGoods(){
+  let tQty=0,tCost=0;
+  document.querySelectorAll('#goodsBody tr').forEach(row=>{
+    const q=parseFloat(row.querySelector('.g-qty')?.value)||0;
+    const u=parseFloat(row.querySelector('.g-unit')?.value)||0;
+    const t=q*u;
+    if(row.querySelector('.g-total')) row.querySelector('.g-total').value=t?peso(t):'';
+    tQty+=q; tCost+=t;
+  });
+  document.getElementById('goodsTotalQty').innerText=tQty||'';
+  document.getElementById('goodsTotalCost').innerText=tCost?'₱'+peso(tCost):'';
+  document.getElementById('goodsEwt1').innerText=tCost?'₱'+peso(tCost*0.01):'';
+  document.getElementById('goodsEwtV1').innerText=tCost?'₱'+peso(tCost*0.01):'';
 }
 
-    function calculate(){
+/* ── CALCULATE ── */
+function calculate(){
+  let tQty=0,tSelling=0,tCost=0,tProfit=0;
 
-let totalQty=0;
-let totalSelling=0;
-let totalCost=0;
-let totalProfit=0;
+  document.querySelectorAll('#tableBody tr').forEach(row=>{
+    const item   = parseFloat(row.querySelector('.item').value)||0;
+    const pdm    = parseFloat(row.querySelector('.printing').value)||0;
+    const sInput = row.querySelector('.selling');
+    const selling= getSellingVal(sInput);
+    const qty    = parseFloat(row.querySelector('.qty').value)||0;
+    const hasInput= row.querySelector('.item').value!==''||row.querySelector('.printing').value!=='';
+    const cost   = hasInput ? item+pdm : null;
 
-document
-.querySelectorAll('#tableBody tr')
-.forEach(row=>{
+    row.querySelector('.cost').value   = cost!==null ? peso(cost):'';
+    row.querySelector('.markup').value = cost!==null ? peso(cost*1.4):'';
 
-let item=
-parseFloat(
-row.querySelector('.item').value
-);
+    const rowSelling=selling*qty;
+    row.querySelector('.totalSelling').value=rowSelling?peso(rowSelling):'';
+    const rowCost=cost!==null?cost*qty:null;
+    row.querySelector('.totalCostAmt').value=rowCost!==null?peso(rowCost):'';
 
-let printing=
-parseFloat(
-row.querySelector('.printing').value
-);
+    const profit=rowCost!==null?rowSelling-rowCost:rowSelling;
+    row.querySelector('.profit').value=(rowSelling||rowCost)?peso(profit):'';
+    const pPct=rowSelling>0?(profit/rowSelling)*100:0;
+    const pctCell=row.querySelector('.profit-pct-main');
+    const pctRound=row.querySelector('.profit-pct-round');
+    if(rowSelling){
+      pctCell.innerText=pPct.toFixed(2)+'%';
+      pctRound.innerText='('+Math.round(pPct)+'%)';
+    } else {
+      pctCell.innerText=''; pctRound.innerText='';
+    }
 
-let selling=
-parseFloat(
-row.querySelector('.selling').value
-) || 0;
+    tQty+=qty; tSelling+=rowSelling;
+    if(rowCost!==null) tCost+=rowCost;
+    tProfit+=profit;
+  });
 
-let qty=
-parseFloat(
-row.querySelector('.qty').value
-) || 0;
+  document.getElementById('totalQty').innerText    =tQty;
+  document.getElementById('totalSelling').innerText='₱'+peso(tSelling);
+  document.getElementById('totalCost').innerText   ='₱'+peso(tCost);
 
-let cost=null;
+  const grossMargin=tSelling>0?(tProfit/tSelling)*100:0;
+  document.getElementById('grossProfit').innerText=('₱'+peso(tProfit));
+  document.getElementById('grossMargin').innerText=grossMargin.toFixed(2)+'% ('+Math.round(grossMargin)+'%)';
 
-if(
-!isNaN(item)
-||
-!isNaN(printing)
-){
+  const expPct  =parseFloat(document.getElementById('expensePercent').value)||0;
+  const expAmt  =tSelling*(expPct/100);
+  const netProfit=tProfit-expAmt;
+  const netMargin=tSelling>0?(netProfit/tSelling)*100:0;
+  const netAfterTax=netMargin-10;
 
-cost=
-(isNaN(item)?0:item)
-+
-(isNaN(printing)?0:printing);
+  document.getElementById('expenseAmount').innerText='₱'+peso(expAmt);
+  document.getElementById('netProfit').innerText    ='₱'+peso(netProfit);
+  document.getElementById('netMargin').innerText    =netAfterTax.toFixed(2)+'% ('+Math.round(netAfterTax)+'%)';
 
-row.querySelector('.cost').value=
-peso(cost);
+  ['grossProfit','netProfit'].forEach(id=>{
+    const el=document.getElementById(id);
+    el.className='metric-value '+(pParse(el.innerText)>=0?'profit':'loss');
+  });
 
-row.querySelector('.markup').value=
-peso(cost*1.4);
-
-}else{
-
-row.querySelector('.cost').value='';
-row.querySelector('.markup').value='';
-
+  // EWT optional
+  if(ewtEnabled){
+    const ewtPct=parseFloat(document.getElementById('ewtPercent').value)||0;
+    const ewtAmt=tSelling*(ewtPct/100);
+    document.getElementById('ewtValue').innerText=tSelling?'₱'+peso(ewtAmt):'—';
+  }
 }
 
-let rowSelling=
-selling*qty;
-
-row.querySelector('.totalSelling').value=
-peso(rowSelling);
-
-let rowCost=null;
-
-if(cost!==null){
-
-rowCost=
-cost*qty;
-
-row.querySelector('.totalCost').value=
-peso(rowCost);
-
-}else{
-
-row.querySelector('.totalCost').value='';
-
-}
-
-let profit=
-rowCost!==null
-?
-rowSelling-rowCost
-:
-rowSelling;
-
-row.querySelector('.profit').value=
-peso(profit);
-
-let profitPercent=0;
-
-if(rowSelling>0){
-
-profitPercent=
-(profit/rowSelling)*100;
-
-}
-
-row.querySelector('.profitPercent').value=
-profitPercent.toFixed(2)+'%';
-
-totalQty+=qty;
-totalSelling+=rowSelling;
-
-if(rowCost!==null){
-
-totalCost+=rowCost;
-
-}
-
-totalProfit+=profit;
-
+/* ── ENTER KEY NAV ── */
+document.addEventListener('keydown',function(e){
+  if(e.key!=='Enter') return;
+  const cur=document.activeElement;
+  const editables=['item','printing','selling','qty'];
+  if(!editables.some(c=>cur.classList.contains(c))) return;
+  if(cur.hasAttribute('readonly')) return;
+  e.preventDefault();
+  const row=cur.closest('tr'); if(!row) return;
+  const field=editables.find(f=>cur.classList.contains(f));
+  const next=row.nextElementSibling; if(!next) return;
+  const target=next.querySelector('.'+field);
+  if(target){target.focus();target.select?.();}
 });
 
-document.getElementById('totalQty').innerText=
-totalQty;
-
-document.getElementById('totalSelling').innerText=
-'₱'+peso(totalSelling);
-
-document.getElementById('totalCost').innerText=
-'₱'+peso(totalCost);
-
-document.getElementById('grossProfit').innerText=
-'₱'+peso(totalProfit);
-
-let grossMargin=0;
-
-if(totalSelling>0){
-
-grossMargin=
-(totalProfit/totalSelling)*100;
-
-}
-
-document.getElementById('grossMargin').innerText=
-grossMargin.toFixed(2)
-+
-'% ('
-+
-Math.round(grossMargin)
-+
-'%)';
-
-let expensePercent=
-parseFloat(
-document.getElementById('expensePercent').value
-) || 0;
-
-let expenseAmount=
-totalSelling*
-(expensePercent/100);
-
-let netProfit=
-totalProfit-
-expenseAmount;
-
-document.getElementById('expenseAmount').innerText=
-'₱'+peso(expenseAmount);
-
-document.getElementById('netProfit').innerText=
-'₱'+peso(netProfit);
-
-let netMargin=0;
-
-if(totalSelling>0){
-
-netMargin=
-(netProfit/totalSelling)*100;
-
-}
-
-let netMarginWithTax=
-netMargin-10;
-
-document.getElementById('netMargin').innerText=
-netMarginWithTax.toFixed(2)
-+
-'% ('
-+
-Math.round(netMarginWithTax)
-+
-'%)';
-
-}
-
-
-    document.addEventListener(
-'keydown',
-function(e){
-
-if(e.key!=='Enter'){
-return;
-}
-
-const current=
-document.activeElement;
-
-if(
-!current.classList.contains('form-control')
-||
-current.hasAttribute('readonly')
-){
-return;
-}
-
-e.preventDefault();
-
-const currentRow=
-current.closest('tr');
-
-if(!currentRow){
-return;
-}
-
-const editableFields=[
-'item',
-'printing',
-'selling',
-'qty'
-];
-
-let currentField=null;
-
-editableFields.forEach(field=>{
-
-if(
-current.classList.contains(field)
-){
-currentField=field;
-}
-
-});
-
-if(!currentField){
-return;
-}
-
-const nextRow=
-currentRow.nextElementSibling;
-
-if(!nextRow){
-return;
-}
-
-const target=
-nextRow.querySelector(
-'.'+currentField
-);
-
-if(target){
-
-target.focus();
-
-target.select?.();
-
-}
-
-}
-);
-
+/* ── INIT ── */
 window.onload=function(){
-
-addRow();
-
+  document.getElementById('docDate').value=new Date().toISOString().split('T')[0];
+  addRow();
 };
-
 </script>
-
 </body>
 </html>
