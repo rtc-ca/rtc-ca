@@ -351,6 +351,7 @@ let ewtEnabled = false;
 function peso(v){return Number(v||0).toLocaleString('en-PH',{minimumFractionDigits:2,maximumFractionDigits:2});}
 function pParse(s){return parseFloat((s||'').toString().replace(/[₱,()]/g,''))||0;}
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2);}
+function getTodayDate(){const d=new Date();return d.toISOString().split('T')[0];}
 
 /* ══ SAVE STATUS ══ */
 function markUnsaved(){
@@ -919,11 +920,6 @@ function exportImage(){
 }
 
 /* ══ INIT ══ */
-function getTodayDate(){
-  const d = new Date();
-  return d.toISOString().split('T')[0];
-}
-
 window.onload=function(){
   const today = getTodayDate();
   const saved=localStorage.getItem(STORAGE_KEY);
@@ -933,12 +929,12 @@ window.onload=function(){
       tabs=parsed.tabs||[];
       activeTabId=parsed.activeTabId||null;
       if(tabs.length&&activeTabId){
-        // auto-update date on active tab to today
         const tab=tabs.find(t=>t.id===activeTabId)||tabs[0];
-        if(tab.data) tab.data.date = today;
         activeTabId=tab.id;
         renderTabs();
         loadDataIntoUI(tab.data);
+        // force today AFTER load
+        document.getElementById('docDate').value=today;
         renderTabs();
         markSaved();
         return;
