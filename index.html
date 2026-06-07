@@ -6,6 +6,7 @@
 <title>RTC Cost Analysis</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <style>
 :root{--maroon:#7b0d0d;--maroon-light:#a01515;--maroon-pale:#fdf3f3;--dark:#1a1a2e;--gray:#6b7280;--border:#e5e7eb;--bg:#f7f8fc;--white:#ffffff;}
 *{box-sizing:border-box;}
@@ -208,7 +209,8 @@ table.cost-table{width:100%;border-collapse:collapse;font-size:.78rem;}
   <div class="d-flex gap-2 align-items-center">
     <span class="save-status" id="saveStatus">All changes saved</span>
     <button class="btn-green" onclick="manualSave()">💾 Save</button>
-    <button class="btn-maroon" onclick="window.print()">⬇ Export PDF</button>
+    <button class="btn-outline-maroon" onclick="exportImage()">🖼 Export Image</button>
+    <button class="btn-maroon" onclick="exportPDF()">⬇ Export PDF</button>
   </div>
 </div>
 
@@ -421,7 +423,7 @@ function manualSave(){saveAll();}
 /* ══ LOAD DATA INTO UI ══ */
 function loadDataIntoUI(data){
   if(!data) return;
-  document.getElementById('docDate').value=data.date||'';
+  document.getElementById('docDate').value=getTodayDate(); // always today
   document.getElementById('docClient').value=data.client||'';
   document.getElementById('docProject').value=data.project||'';
   document.getElementById('docRef').value=data.ref||'';
@@ -665,7 +667,7 @@ function deleteAllRows(){
   // Clear table
   document.getElementById('tableBody').innerHTML='';
   // Clear doc info fields
-  document.getElementById('docDate').value=new Date().toISOString().split('T')[0];
+  document.getElementById('docDate').value=getTodayDate();
   document.getElementById('docClient').value='';
   document.getElementById('docProject').value='';
   document.getElementById('docRef').value='';
@@ -796,8 +798,134 @@ document.addEventListener('keydown',function(e){
   if(target){target.focus();target.select?.();}
 });
 
+/* ══ EXPORT PDF ══ */
+function exportPDF(){
+  const prev = document.title;
+  document.title = 'RTC COST ANALYSIS';
+  window.print();
+  setTimeout(()=>{ document.title = prev; }, 1000);
+}
+
+/* ══ FILENAME HELPER ══ */
+function getFilename(ext){
+  const client = (document.getElementById('docClient').value||'NoClient')
+    .trim().replace(/\s+/g,'').replace(/[^a-zA-Z0-9]/g,'');
+  const d = new Date();
+  const mm = String(d.getMonth()+1).padStart(2,'0');
+  const dd = String(d.getDate()).padStart(2,'0');
+  const yyyy = d.getFullYear();
+  return `${client}_RTC-CA_${mm}-${dd}-${yyyy}.${ext}`;
+}
+
+/* ══ EXPORT IMAGE ══ */
+function exportImage(){
+  const btn = document.querySelector('[onclick="exportImage()"]');
+  btn.innerText = '⏳ Generating...';
+  btn.disabled = true;
+
+  // Add print class to body to trigger print CSS
+  document.body.classList.add('printing-image');
+
+  // Inject a style tag that mirrors @media print rules
+  const styleTag = document.createElement('style');
+  styleTag.id = 'img-print-style';
+  styleTag.innerHTML = `
+    body.printing-image .no-print,
+    body.printing-image .app-header,
+    body.printing-image .toolbar,
+    body.printing-image #addGoodsBtn,
+    body.printing-image .tabs-bar { display:none !important; }
+    body.printing-image { background:#fff !important; font-size:8.5pt; }
+    body.printing-image .container-fluid { padding:0 !important; }
+    body.printing-image .row { display:block !important; }
+    body.printing-image .col-lg-9,
+    body.printing-image .col-lg-3 { width:100% !important; max-width:100% !important; flex:none !important; padding:0 !important; }
+    body.printing-image .summary-panel { position:static !important; box-shadow:none !important; border:1px solid #ccc !important; border-radius:0 !important; margin-top:6pt !important; }
+    body.printing-image .summary-header { padding:4pt 8pt !important; font-size:7.5pt !important; }
+    body.printing-image .summary-body { display:grid !important; grid-template-columns:repeat(6,1fr) !important; padding:3pt 6pt !important; gap:0 !important; }
+    body.printing-image .metric { flex-direction:column !important; align-items:flex-start !important; padding:3pt 5pt !important; border-bottom:none !important; border-right:1px solid #eee !important; gap:1pt !important; }
+    body.printing-image .metric:last-child { border-right:none !important; }
+    body.printing-image .metric small { font-size:.56rem !important; }
+    body.printing-image .metric-value { font-size:.76rem !important; }
+    body.printing-image .metric input { display:none !important; }
+    body.printing-image .ewt-toggle-row { flex-direction:column !important; align-items:flex-start !important; padding:3pt 5pt !important; border-bottom:none !important; border-right:1px solid #eee !important; }
+    body.printing-image .ewt-inputs input[type="number"],
+    body.printing-image .ewt-toggle-row button,
+    body.printing-image #ewtOffState { display:none !important; }
+    body.printing-image .main-card,
+    body.printing-image .goods-card,
+    body.printing-image .doc-info-card { box-shadow:none !important; border-radius:0 !important; }
+    body.printing-image .main-card { border:1px solid #ccc !important; }
+    body.printing-image .main-card .card-body { padding:6pt !important; }
+    body.printing-image .doc-info-card { border-radius:0 !important; margin-bottom:6pt !important; padding:5pt 8pt !important; border:1px solid #ddd !important; }
+    body.printing-image .doc-info-grid { display:grid !important; grid-template-columns:repeat(5,1fr) !important; gap:0 8pt !important; }
+    body.printing-image .doc-field label { font-size:6pt !important; margin-bottom:1pt !important; }
+    body.printing-image .doc-field input,
+    body.printing-image .doc-field textarea { font-size:7.5pt !important; border-bottom:none !important; padding:0 !important; }
+    body.printing-image .cost-table { font-size:7pt !important; }
+    body.printing-image .cost-table thead tr th { padding:4pt 3pt !important; font-size:6.5pt !important; }
+    body.printing-image .cost-table tbody td { padding:2pt 2pt !important; }
+    body.printing-image .cost-table input[type="text"],
+    body.printing-image .cost-table input[type="number"] { border:none !important; background:transparent !important; padding:0 !important; font-size:7pt !important; min-width:0 !important; }
+    body.printing-image .cost-table textarea.supplier-name { border:none !important; background:transparent !important; padding:0 !important; font-size:7pt !important; min-width:0 !important; resize:none !important; }
+    body.printing-image .img-cell { width:50pt !important; min-width:50pt !important; }
+    body.printing-image .img-upload-btn { width:50pt !important; height:50pt !important; border:1px solid #ddd !important; }
+    body.printing-image .img-upload-btn input[type="file"] { display:none !important; }
+    body.printing-image .upload-label { display:none !important; }
+    body.printing-image .goods-card { margin-top:6pt !important; padding:4pt 6pt !important; border:1px solid #ccc !important; }
+    body.printing-image .goods-table { font-size:7pt !important; }
+    body.printing-image .goods-table input { border:none !important; background:transparent !important; font-size:7pt !important; }
+    body.printing-image .sig-section { position:static !important; margin-top:10pt !important; background:#fff !important; border:none !important; border-top:1.5px solid #7b0d0d !important; border-radius:0 !important; box-shadow:none !important; padding:6pt 0 0 !important; }
+    body.printing-image .sig-grid { display:grid !important; grid-template-columns:repeat(4,1fr) !important; gap:0 !important; }
+    body.printing-image .sig-block { text-align:center !important; padding:0 8pt !important; }
+    body.printing-image .sig-space { height:22pt !important; margin-bottom:3pt !important; }
+    body.printing-image .sig-name { font-size:7.5pt !important; border:none !important; border-bottom:1px solid #555 !important; }
+    body.printing-image .sig-role { font-size:6pt !important; margin-top:3pt !important; }
+    body.printing-image .section-label.sig-label { display:none !important; }
+    body.printing-image .section-label { font-size:8pt !important; margin-bottom:4pt !important; padding-bottom:2pt !important; }
+    body.printing-image .profit-pct-main { font-size:7pt !important; }
+    body.printing-image .profit-pct-round { font-size:6.5pt !important; }
+  `;
+  document.head.appendChild(styleTag);
+
+  setTimeout(()=>{
+    const target = document.getElementById('mainContent');
+    html2canvas(target, {
+      scale: 2,
+      useCORS: true,
+      backgroundColor: '#ffffff',
+      scrollX: 0,
+      scrollY: 0,
+      windowWidth: 1122, // ~letter landscape width in px at 96dpi
+    }).then(canvas => {
+      // cleanup
+      document.body.classList.remove('printing-image');
+      document.getElementById('img-print-style')?.remove();
+      btn.innerText = '🖼 Export Image';
+      btn.disabled = false;
+
+      const link = document.createElement('a');
+      link.download = getFilename('png');
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    }).catch(()=>{
+      document.body.classList.remove('printing-image');
+      document.getElementById('img-print-style')?.remove();
+      btn.innerText = '🖼 Export Image';
+      btn.disabled = false;
+      alert('Export failed. Try again.');
+    });
+  }, 300);
+}
+
 /* ══ INIT ══ */
+function getTodayDate(){
+  const d = new Date();
+  return d.toISOString().split('T')[0];
+}
+
 window.onload=function(){
+  const today = getTodayDate();
   const saved=localStorage.getItem(STORAGE_KEY);
   if(saved){
     try{
@@ -805,9 +933,11 @@ window.onload=function(){
       tabs=parsed.tabs||[];
       activeTabId=parsed.activeTabId||null;
       if(tabs.length&&activeTabId){
-        renderTabs();
+        // auto-update date on active tab to today
         const tab=tabs.find(t=>t.id===activeTabId)||tabs[0];
+        if(tab.data) tab.data.date = today;
         activeTabId=tab.id;
+        renderTabs();
         loadDataIntoUI(tab.data);
         renderTabs();
         markSaved();
@@ -817,10 +947,10 @@ window.onload=function(){
   }
   // Fresh start
   const id=uid();
-  tabs=[{id,name:'Quote 1',data:{}}];
+  tabs=[{id,name:'Quote 1',data:{date:today}}];
   activeTabId=id;
   renderTabs();
-  document.getElementById('docDate').value=new Date().toISOString().split('T')[0];
+  document.getElementById('docDate').value=today;
   document.getElementById('sigName3').value='RAM MIRCH';
   addRow();
   markSaved();
