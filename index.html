@@ -7,16 +7,51 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-:root {
-  --maroon:#7b0d0d; --maroon-light:#a01515; --maroon-pale:#fdf3f3;
-  --dark:#1a1a2e; --gray:#6b7280; --border:#e5e7eb; --bg:#f7f8fc; --white:#ffffff;
-}
+:root{--maroon:#7b0d0d;--maroon-light:#a01515;--maroon-pale:#fdf3f3;--dark:#1a1a2e;--gray:#6b7280;--border:#e5e7eb;--bg:#f7f8fc;--white:#ffffff;}
 *{box-sizing:border-box;}
 body{background:var(--bg);font-family:'DM Sans',sans-serif;color:var(--dark);font-size:.875rem;margin:0;}
 
 /* HEADER */
-.app-header{background:var(--white);border-bottom:3px solid var(--maroon);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 10px rgba(123,13,13,.08);}
+.app-header{background:var(--white);border-bottom:3px solid var(--maroon);padding:12px 24px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 10px rgba(123,13,13,.08);}
 .rtc-title{font-family:'Playfair Display',serif;color:var(--maroon);font-size:1.5rem;font-weight:900;margin:0;}
+
+/* TABS */
+.tabs-bar{background:var(--white);border-bottom:2px solid var(--border);padding:0 24px;display:flex;align-items:flex-end;gap:4px;overflow-x:auto;}
+.tab-btn{
+  display:flex;align-items:center;gap:6px;
+  padding:8px 14px;font-size:.8rem;font-weight:600;
+  border:1px solid transparent;border-bottom:none;
+  border-radius:8px 8px 0 0;cursor:pointer;
+  background:transparent;color:var(--gray);
+  white-space:nowrap;transition:all .15s;
+  margin-bottom:-2px;
+}
+.tab-btn:hover{background:var(--maroon-pale);color:var(--maroon);}
+.tab-btn.active{background:var(--white);color:var(--maroon);border-color:var(--border);border-bottom-color:var(--white);}
+.tab-btn .tab-close{
+  width:16px;height:16px;border-radius:50%;display:flex;align-items:center;
+  justify-content:center;font-size:.65rem;background:transparent;
+  border:none;cursor:pointer;color:var(--gray);padding:0;
+  transition:background .15s,color .15s;
+}
+.tab-btn .tab-close:hover{background:#fee2e2;color:#991b1b;}
+.tab-btn .tab-name{max-width:120px;overflow:hidden;text-overflow:ellipsis;}
+.tab-name-input{
+  border:none;border-bottom:1px solid var(--maroon);outline:none;
+  font-size:.8rem;font-weight:600;color:var(--maroon);
+  background:transparent;width:100px;font-family:'DM Sans',sans-serif;
+}
+.add-tab-btn{
+  padding:6px 10px;font-size:.85rem;color:var(--gray);
+  background:transparent;border:none;cursor:pointer;
+  border-radius:6px;margin-bottom:2px;transition:all .15s;
+}
+.add-tab-btn:hover{background:var(--maroon-pale);color:var(--maroon);}
+
+/* SAVE STATUS */
+.save-status{font-size:.7rem;color:var(--gray);font-style:italic;}
+.save-status.saved{color:#166534;}
+.save-status.unsaved{color:#b07d27;}
 
 /* DOC INFO */
 .doc-info-card{background:var(--white);border:1px solid var(--border);border-left:4px solid var(--maroon);border-radius:8px;padding:14px 20px;margin-bottom:16px;box-shadow:0 1px 6px rgba(0,0,0,.04);}
@@ -41,25 +76,12 @@ table.cost-table{width:100%;border-collapse:collapse;font-size:.78rem;}
 .cost-table input[type="text"],.cost-table input[type="number"]{border:1px solid transparent;border-radius:4px;padding:4px 5px;width:100%;font-size:.78rem;background:transparent;transition:border-color .15s,background .15s;min-width:55px;}
 .cost-table input:focus{outline:none;border-color:var(--maroon);background:#fff;}
 .cost-table input.readonly{background:#f8fafc;color:var(--gray);cursor:default;}
-
-/* SUPPLIER TEXTAREA */
-.cost-table textarea.supplier-name{
-  border:1px solid transparent;border-radius:4px;padding:4px 5px;
-  width:100%;font-size:.78rem;background:transparent;
-  transition:border-color .15s,background .15s;
-  min-width:130px;resize:none;overflow:hidden;
-  font-family:'DM Sans',sans-serif;line-height:1.4;
-  min-height:32px;vertical-align:top;
-}
+.cost-table textarea.supplier-name{border:1px solid transparent;border-radius:4px;padding:4px 5px;width:100%;font-size:.78rem;background:transparent;transition:border-color .15s,background .15s;min-width:130px;resize:none;overflow:hidden;font-family:'DM Sans',sans-serif;line-height:1.4;min-height:32px;vertical-align:top;}
 .cost-table textarea.supplier-name:focus{outline:none;border-color:var(--maroon);background:#fff;}
 
 /* IMAGE CELL */
 .img-cell{text-align:center;width:82px;min-width:82px;}
-.img-upload-btn{
-  width:72px;height:72px;border:2px dashed #d1d5db;border-radius:6px;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;font-size:.58rem;color:#9ca3af;
-  overflow:hidden;background:#fafafa;margin:0 auto;position:relative;flex-shrink:0;transition:border-color .2s;
-}
+.img-upload-btn{width:72px;height:72px;border:2px dashed #d1d5db;border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.58rem;color:#9ca3af;overflow:hidden;background:#fafafa;margin:0 auto;position:relative;flex-shrink:0;transition:border-color .2s;}
 .img-upload-btn:hover{border-color:var(--maroon);background:var(--maroon-pale);color:var(--maroon);}
 .img-upload-btn img{width:100%;height:100%;object-fit:cover;border-radius:4px;position:absolute;inset:0;display:none;}
 .img-upload-btn.has-img img{display:block;}
@@ -74,16 +96,16 @@ table.cost-table{width:100%;border-collapse:collapse;font-size:.78rem;}
 .metric:last-child{border-bottom:none;}
 .metric small{font-size:.66rem;font-weight:600;color:var(--gray);text-transform:uppercase;letter-spacing:.5px;flex-shrink:0;}
 .metric-value{font-size:.88rem;font-weight:700;color:var(--dark);text-align:right;}
-.metric-value.profit{color:#166534;} .metric-value.loss{color:#991b1b;} .metric-value.gold{color:#b07d27;}
+.metric-value.profit{color:#166534;}.metric-value.loss{color:#991b1b;}.metric-value.gold{color:#b07d27;}
 
-/* EWT TOGGLE */
+/* EWT */
 .ewt-toggle-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #f0f0f0;}
 .ewt-toggle-row small{font-size:.66rem;font-weight:600;color:var(--gray);text-transform:uppercase;letter-spacing:.5px;}
 .ewt-inputs{display:flex;align-items:center;gap:5px;margin-top:4px;}
 .ewt-inputs input[type="number"]{border:1px solid var(--border);border-radius:5px;padding:3px 6px;font-size:.76rem;width:60px;outline:none;text-align:right;}
 .ewt-inputs input:focus{border-color:var(--maroon);}
 
-/* GOODS BREAKDOWN */
+/* GOODS */
 .goods-card{background:var(--white);border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin-top:14px;box-shadow:0 1px 6px rgba(0,0,0,.04);}
 .goods-table{width:100%;border-collapse:collapse;font-size:.78rem;margin-top:8px;}
 .goods-table thead tr th{background:#4b0505;color:#fff;font-weight:600;padding:7px 8px;text-align:center;font-size:.72rem;border:1px solid #3a0404;}
@@ -110,6 +132,8 @@ table.cost-table{width:100%;border-collapse:collapse;font-size:.78rem;}
 .btn-outline-maroon:hover{background:var(--maroon);color:#fff;}
 .btn-danger-sm{background:#fee2e2;color:#991b1b;border:none;border-radius:5px;padding:4px 8px;font-size:.76rem;cursor:pointer;font-weight:600;transition:background .2s;}
 .btn-danger-sm:hover{background:#fecaca;}
+.btn-green{background:#166534;color:#fff;border:none;border-radius:7px;padding:7px 14px;font-size:.8rem;font-weight:600;cursor:pointer;transition:background .2s;}
+.btn-green:hover{background:#14532d;}
 
 /* TOOLBAR */
 .toolbar{display:flex;gap:7px;align-items:center;flex-wrap:wrap;margin-bottom:12px;}
@@ -118,17 +142,13 @@ table.cost-table{width:100%;border-collapse:collapse;font-size:.78rem;}
 
 /* ══ PRINT ══ */
 @media print {
-  @page { size:letter landscape; margin:1.2cm 1.4cm; }
+  @page{size:letter landscape;margin:1.2cm 1.4cm;}
   *{-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important;}
-
   body{background:#fff !important;font-size:8.5pt;}
-  .no-print,.app-header,.toolbar,#addGoodsBtn{display:none !important;}
-
+  .no-print,.app-header,.toolbar,#addGoodsBtn,.tabs-bar{display:none !important;}
   .container-fluid{padding:0 !important;}
   .row{display:block !important;}
   .col-lg-9,.col-lg-3{width:100% !important;max-width:100% !important;flex:none !important;padding:0 !important;}
-
-  /* summary: horizontal strip */
   .summary-panel{position:static !important;box-shadow:none !important;border:1px solid #ccc !important;border-radius:0 !important;margin-top:6pt !important;page-break-inside:avoid;break-inside:avoid;}
   .summary-header{padding:4pt 8pt !important;font-size:7.5pt !important;}
   .summary-body{display:grid !important;grid-template-columns:repeat(6,1fr) !important;padding:3pt 6pt !important;gap:0 !important;}
@@ -139,18 +159,14 @@ table.cost-table{width:100%;border-collapse:collapse;font-size:.78rem;}
   .metric input{display:none !important;}
   .ewt-toggle-row{flex-direction:column !important;align-items:flex-start !important;padding:3pt 5pt !important;border-bottom:none !important;border-right:1px solid #eee !important;}
   .ewt-inputs input[type="number"],.ewt-toggle-row button,#ewtOffState{display:none !important;}
-
-  /* cards */
   .main-card,.goods-card,.doc-info-card{box-shadow:none !important;border-radius:0 !important;}
   .main-card{border:1px solid #ccc !important;}
   .main-card .card-body{padding:6pt !important;}
-  .doc-info-card{border-radius:0 !important;margin-bottom:6pt !important;padding:6pt 10pt !important;border:1px solid #ddd !important;}
-
-  /* doc fields */
-  .doc-field input,.doc-field textarea{font-size:8pt !important;border-bottom:none !important;padding:0 !important;}
+  .doc-info-card{border-radius:0 !important;margin-bottom:6pt !important;padding:5pt 8pt !important;border:1px solid #ddd !important;}
+  .doc-info-grid{display:grid !important;grid-template-columns:repeat(5,1fr) !important;gap:0 8pt !important;align-items:start !important;}
+  .doc-field label{font-size:6pt !important;margin-bottom:1pt !important;}
+  .doc-field input,.doc-field textarea{font-size:7.5pt !important;border-bottom:none !important;padding:0 !important;overflow:hidden !important;}
   .doc-field input:placeholder-shown,.doc-field textarea:placeholder-shown{display:none !important;}
-
-  /* main table */
   .cost-table{font-size:7pt !important;}
   .cost-table thead tr th{padding:4pt 3pt !important;font-size:6.5pt !important;}
   .cost-table tbody td{padding:2pt 2pt !important;}
@@ -160,39 +176,17 @@ table.cost-table{width:100%;border-collapse:collapse;font-size:.78rem;}
   .cost-table textarea:placeholder-shown{visibility:hidden;}
   .profit-pct-main{font-size:7pt !important;}
   .profit-pct-round{font-size:6.5pt !important;}
-
-  /* image */
   .img-cell{width:50pt !important;min-width:50pt !important;}
   .img-upload-btn{width:50pt !important;height:50pt !important;border:1px solid #ddd !important;}
   .img-upload-btn input[type="file"]{display:none !important;}
   .upload-label{display:none !important;}
-
-  /* goods */
   .goods-card{margin-top:6pt !important;padding:4pt 6pt !important;border:1px solid #ccc !important;page-break-inside:avoid;break-inside:avoid;}
   .goods-table{font-size:7pt !important;}
   .goods-table input{border:none !important;background:transparent !important;font-size:7pt !important;}
   .goods-table input:placeholder-shown{visibility:hidden;}
-
-  /* SIGNATURE — single row 4 columns, always last */
-  .sig-section{
-    position:static !important;
-    margin-top:10pt !important;
-    background:#fff !important;
-    border:none !important;
-    border-top:1.5px solid #7b0d0d !important;
-    border-radius:0 !important;
-    box-shadow:none !important;
-    padding:6pt 0 0 !important;
-    page-break-inside:avoid;
-    break-inside:avoid;
-    break-before:avoid;
-  }
+  .sig-section{position:static !important;margin-top:10pt !important;background:#fff !important;border:none !important;border-top:1.5px solid #7b0d0d !important;border-radius:0 !important;box-shadow:none !important;padding:6pt 0 0 !important;page-break-inside:avoid;break-inside:avoid;break-before:avoid;}
   .section-label.sig-label{font-size:7.5pt !important;margin-bottom:4pt !important;padding-bottom:2pt !important;}
-  .sig-grid{
-    display:grid !important;
-    grid-template-columns:repeat(4,1fr) !important;
-    gap:0 !important;
-  }
+  .sig-grid{display:grid !important;grid-template-columns:repeat(4,1fr) !important;gap:0 !important;}
   .sig-block{text-align:center !important;padding:0 8pt !important;}
   .sig-space{height:22pt !important;margin-bottom:3pt !important;}
   .sig-name{font-size:7.5pt !important;border:none !important;border-bottom:1px solid #555 !important;width:100% !important;display:block !important;text-align:center !important;}
@@ -200,7 +194,6 @@ table.cost-table{width:100%;border-collapse:collapse;font-size:.78rem;}
   .sig-role{font-size:6pt !important;margin-top:3pt !important;letter-spacing:.4px !important;}
   .section-label{font-size:8pt !important;margin-bottom:4pt !important;padding-bottom:2pt !important;}
 }
-
 @media (max-width:991px){
   .summary-panel{position:relative;}
   .sig-grid{grid-template-columns:repeat(2,1fr);}
@@ -209,32 +202,38 @@ table.cost-table{width:100%;border-collapse:collapse;font-size:.78rem;}
 </head>
 <body>
 
+<!-- HEADER -->
 <div class="app-header no-print">
   <div class="rtc-title">RTC Cost Analysis</div>
-  <div class="d-flex gap-2">
+  <div class="d-flex gap-2 align-items-center">
+    <span class="save-status" id="saveStatus">All changes saved</span>
+    <button class="btn-green" onclick="manualSave()">💾 Save</button>
     <button class="btn-maroon" onclick="window.print()">⬇ Export PDF</button>
   </div>
 </div>
 
-<div class="container-fluid py-3 px-3 px-md-4">
+<!-- TABS -->
+<div class="tabs-bar no-print" id="tabsBar">
+  <!-- tabs injected here -->
+  <button class="add-tab-btn" onclick="addTab()" title="New Quotation">＋ New Quote</button>
+</div>
+
+<div class="container-fluid py-3 px-3 px-md-4" id="mainContent">
 
   <!-- DOC INFO -->
   <div class="doc-info-card">
     <div class="doc-info-grid">
-      <div class="doc-field"><label>Date</label><input type="date" id="docDate"></div>
-      <div class="doc-field"><label>Client</label><textarea id="docClient" placeholder=" " rows="1" oninput="autoResize(this)"></textarea></div>
-      <div class="doc-field"><label>Name of Project</label><textarea id="docProject" placeholder=" " rows="1" oninput="autoResize(this)"></textarea></div>
-      <div class="doc-field"><label>Ref No.</label><textarea id="docRef" placeholder=" " rows="1" oninput="autoResize(this)"></textarea></div>
-      <div class="doc-field"><label>Quotation Number</label><textarea id="docQuotation" placeholder=" " rows="1" oninput="autoResize(this)"></textarea></div>
+      <div class="doc-field"><label>Date</label><input type="date" id="docDate" oninput="markUnsaved()"></div>
+      <div class="doc-field"><label>Client</label><textarea id="docClient" placeholder=" " rows="1" oninput="autoResize(this);markUnsaved()"></textarea></div>
+      <div class="doc-field"><label>Name of Project</label><textarea id="docProject" placeholder=" " rows="1" oninput="autoResize(this);markUnsaved()"></textarea></div>
+      <div class="doc-field"><label>Ref No.</label><textarea id="docRef" placeholder=" " rows="1" oninput="autoResize(this);markUnsaved()"></textarea></div>
+      <div class="doc-field"><label>Quotation Number</label><textarea id="docQuotation" placeholder=" " rows="1" oninput="autoResize(this);markUnsaved()"></textarea></div>
     </div>
   </div>
 
   <div class="row g-3">
-
-    <!-- LEFT -->
     <div class="col-lg-9">
 
-      <!-- Items Table -->
       <div class="main-card">
         <div class="card-body">
           <div class="toolbar no-print">
@@ -243,7 +242,6 @@ table.cost-table{width:100%;border-collapse:collapse;font-size:.78rem;}
             <button class="btn-outline-maroon" onclick="addRow()">+ Add Row</button>
             <button class="btn-danger-sm" onclick="deleteAllRows()">Delete All</button>
           </div>
-          <div class="section-label">Items / Supplier</div>
           <div class="table-responsive">
             <table class="cost-table">
               <thead>
@@ -260,7 +258,6 @@ table.cost-table{width:100%;border-collapse:collapse;font-size:.78rem;}
         </div>
       </div>
 
-      <!-- Goods Breakdown -->
       <div id="goodsSection" style="display:none;">
         <div class="goods-card">
           <div class="d-flex justify-content-between align-items-center mb-1">
@@ -272,27 +269,12 @@ table.cost-table{width:100%;border-collapse:collapse;font-size:.78rem;}
           </div>
           <div class="table-responsive">
             <table class="goods-table">
-              <thead>
-                <tr>
-                  <th style="width:42%">Item</th><th>Qty</th><th>Unit Cost</th><th>Total</th>
-                  <th class="no-print"></th>
-                </tr>
-              </thead>
+              <thead><tr><th style="width:42%">Item</th><th>Qty</th><th>Unit Cost</th><th>Total</th><th class="no-print"></th></tr></thead>
               <tbody id="goodsBody"></tbody>
               <tfoot>
-                <tr class="ewt-row">
-                  <td colspan="3">NON-VAT EWT 1% (Assumed by RTC)</td>
-                  <td id="goodsEwt1"></td><td class="no-print"></td>
-                </tr>
-                <tr class="ewt-row">
-                  <td colspan="3">VATABLE EWT 1% (Assumed by RTC)</td>
-                  <td id="goodsEwtV1"></td><td class="no-print"></td>
-                </tr>
-                <tr class="goods-total-row">
-                  <td colspan="2">TOTAL COST</td>
-                  <td id="goodsTotalQty"></td><td id="goodsTotalCost"></td>
-                  <td class="no-print"></td>
-                </tr>
+                <tr class="ewt-row"><td colspan="3">NON-VAT EWT 1% (Assumed by RTC)</td><td id="goodsEwt1"></td><td class="no-print"></td></tr>
+                <tr class="ewt-row"><td colspan="3">VATABLE EWT 1% (Assumed by RTC)</td><td id="goodsEwtV1"></td><td class="no-print"></td></tr>
+                <tr class="goods-total-row"><td colspan="2">TOTAL COST</td><td id="goodsTotalQty"></td><td id="goodsTotalCost"></td><td class="no-print"></td></tr>
               </tfoot>
             </table>
           </div>
@@ -300,15 +282,11 @@ table.cost-table{width:100%;border-collapse:collapse;font-size:.78rem;}
       </div>
 
       <div id="addGoodsBtn" class="mt-2 no-print">
-        <button class="btn-outline-maroon" onclick="showGoods()"
-          style="width:100%;padding:8px;border-style:dashed;font-size:.78rem;">
-          + Add Goods Breakdown
-        </button>
+        <button class="btn-outline-maroon" onclick="showGoods()" style="width:100%;padding:8px;border-style:dashed;font-size:.78rem;">+ Add Goods Breakdown</button>
       </div>
 
     </div>
 
-    <!-- RIGHT: SUMMARY -->
     <div class="col-lg-3">
       <div class="summary-panel">
         <div class="summary-header">Summary</div>
@@ -320,9 +298,7 @@ table.cost-table{width:100%;border-collapse:collapse;font-size:.78rem;}
           <div class="metric"><small>Gross Margin</small><div id="grossMargin" class="metric-value">0%</div></div>
           <div class="metric">
             <small>Other Exp. (%)</small>
-            <input type="number" id="expensePercent"
-              style="border:1px solid var(--border);border-radius:5px;padding:3px 6px;font-size:.76rem;width:70px;outline:none;text-align:right;"
-              placeholder="0" oninput="calculate()">
+            <input type="number" id="expensePercent" style="border:1px solid var(--border);border-radius:5px;padding:3px 6px;font-size:.76rem;width:70px;outline:none;text-align:right;" placeholder="0" oninput="calculate();markUnsaved()">
           </div>
           <div class="metric"><small>Other Expenses</small><div id="expenseAmount" class="metric-value">₱0.00</div></div>
           <div class="metric"><small>Net Profit</small><div id="netProfit" class="metric-value profit">₱0.00</div></div>
@@ -346,51 +322,269 @@ table.cost-table{width:100%;border-collapse:collapse;font-size:.78rem;}
         </div>
       </div>
     </div>
-
   </div>
 
-  <!-- SIGNATURE — always last, after summary -->
+  <!-- SIGNATURE -->
   <div class="sig-section">
     <div class="section-label sig-label">Authorized Signatories</div>
     <div class="sig-grid">
-      <div class="sig-block">
-        <div class="sig-space"></div>
-        <input type="text" class="sig-name" id="sigName0" placeholder=" ">
-        <span class="sig-role">Prepared by</span>
-      </div>
-      <div class="sig-block">
-        <div class="sig-space"></div>
-        <input type="text" class="sig-name" id="sigName1" placeholder=" ">
-        <span class="sig-role">Noted by</span>
-      </div>
-      <div class="sig-block">
-        <div class="sig-space"></div>
-        <input type="text" class="sig-name" id="sigName2" placeholder=" ">
-        <span class="sig-role">Check by Acctg.</span>
-      </div>
-      <div class="sig-block">
-        <div class="sig-space"></div>
-        <input type="text" class="sig-name" id="sigName3" value="RAM MIRCH" placeholder=" ">
-        <span class="sig-role">Approved by — CSO</span>
-      </div>
+      <div class="sig-block"><div class="sig-space"></div><input type="text" class="sig-name" id="sigName0" placeholder=" " oninput="markUnsaved()"><span class="sig-role">Prepared by</span></div>
+      <div class="sig-block"><div class="sig-space"></div><input type="text" class="sig-name" id="sigName1" placeholder=" " oninput="markUnsaved()"><span class="sig-role">Noted by</span></div>
+      <div class="sig-block"><div class="sig-space"></div><input type="text" class="sig-name" id="sigName2" placeholder=" " oninput="markUnsaved()"><span class="sig-role">Check by Acctg.</span></div>
+      <div class="sig-block"><div class="sig-space"></div><input type="text" class="sig-name" id="sigName3" value="RAM MIRCH" placeholder=" " oninput="markUnsaved()"><span class="sig-role">Approved by — CSO</span></div>
     </div>
   </div>
 
 </div>
 
 <script>
+/* ══ STATE ══ */
+const STORAGE_KEY = 'rtc_quotations_v1';
+let tabs = [];
+let activeTabId = null;
+let autoSaveTimer = null;
+let ewtEnabled = false;
+
+/* ══ UTILS ══ */
 function peso(v){return Number(v||0).toLocaleString('en-PH',{minimumFractionDigits:2,maximumFractionDigits:2});}
 function pParse(s){return parseFloat((s||'').toString().replace(/[₱,()]/g,''))||0;}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2);}
 
-let ewtEnabled=false;
+/* ══ SAVE STATUS ══ */
+function markUnsaved(){
+  document.getElementById('saveStatus').textContent='Unsaved changes';
+  document.getElementById('saveStatus').className='save-status unsaved';
+  clearTimeout(autoSaveTimer);
+  autoSaveTimer=setTimeout(()=>saveAll(),2000);
+}
+function markSaved(){
+  document.getElementById('saveStatus').textContent='All changes saved';
+  document.getElementById('saveStatus').className='save-status saved';
+}
+
+/* ══ COLLECT CURRENT TAB DATA ══ */
+function collectCurrentData(){
+  const rows=[];
+  document.querySelectorAll('#tableBody tr').forEach(tr=>{
+    const img=tr.querySelector('.img-upload-btn img');
+    rows.push({
+      supplier:tr.querySelector('.supplier-name')?.value||'',
+      imgSrc:(img&&img.style.display!=='none'&&img.src&&img.src.startsWith('data:'))?img.src:'',
+      item:tr.querySelector('.item').value,
+      printing:tr.querySelector('.printing').value,
+      selling:tr.querySelector('.selling').dataset.raw||tr.querySelector('.selling').value,
+      qty:tr.querySelector('.qty').value,
+    });
+  });
+  const goodsRows=[];
+  document.querySelectorAll('#goodsBody tr').forEach(tr=>{
+    goodsRows.push({
+      item:tr.querySelector('input[type="text"]')?.value||'',
+      qty:tr.querySelector('.g-qty')?.value||'',
+      unit:tr.querySelector('.g-unit')?.value||'',
+    });
+  });
+  return{
+    date:document.getElementById('docDate').value,
+    client:document.getElementById('docClient').value,
+    project:document.getElementById('docProject').value,
+    ref:document.getElementById('docRef').value,
+    quotation:document.getElementById('docQuotation').value,
+    expPct:document.getElementById('expensePercent').value,
+    ewtEnabled,
+    ewtPct:document.getElementById('ewtPercent')?.value||'1',
+    sigName0:document.getElementById('sigName0').value,
+    sigName1:document.getElementById('sigName1').value,
+    sigName2:document.getElementById('sigName2').value,
+    sigName3:document.getElementById('sigName3').value,
+    rows,
+    goodsRows,
+    goodsVisible:document.getElementById('goodsSection').style.display!=='none',
+  };
+}
+
+/* ══ SAVE ══ */
+function saveAll(){
+  if(activeTabId){
+    const tab=tabs.find(t=>t.id===activeTabId);
+    if(tab) tab.data=collectCurrentData();
+  }
+  try{
+    localStorage.setItem(STORAGE_KEY,JSON.stringify({tabs,activeTabId}));
+    markSaved();
+  }catch(e){
+    document.getElementById('saveStatus').textContent='Save failed (storage full?)';
+  }
+}
+function manualSave(){saveAll();}
+
+/* ══ LOAD DATA INTO UI ══ */
+function loadDataIntoUI(data){
+  if(!data) return;
+  document.getElementById('docDate').value=data.date||'';
+  document.getElementById('docClient').value=data.client||'';
+  document.getElementById('docProject').value=data.project||'';
+  document.getElementById('docRef').value=data.ref||'';
+  document.getElementById('docQuotation').value=data.quotation||'';
+  document.getElementById('expensePercent').value=data.expPct||'';
+  document.getElementById('sigName0').value=data.sigName0||'';
+  document.getElementById('sigName1').value=data.sigName1||'';
+  document.getElementById('sigName2').value=data.sigName2||'RAM MIRCH';
+  document.getElementById('sigName3').value=data.sigName3||'RAM MIRCH';
+
+  // fix: sigName2 and sigName3 correct mapping
+  document.getElementById('sigName2').value=data.sigName2||'';
+  document.getElementById('sigName3').value=data.sigName3||'RAM MIRCH';
+
+  document.querySelectorAll('.doc-field textarea').forEach(t=>autoResize(t));
+
+  // EWT
+  ewtEnabled=data.ewtEnabled||false;
+  document.getElementById('ewtOffState').style.display=ewtEnabled?'none':'flex';
+  document.getElementById('ewtOnState').style.display=ewtEnabled?'block':'none';
+  if(data.ewtPct) document.getElementById('ewtPercent').value=data.ewtPct;
+
+  // Rows
+  document.getElementById('tableBody').innerHTML='';
+  (data.rows||[]).forEach(r=>{
+    addRow();
+    const tr=document.getElementById('tableBody').lastElementChild;
+    tr.querySelector('.supplier-name').value=r.supplier||'';
+    autoResize(tr.querySelector('.supplier-name'));
+    tr.querySelector('.item').value=r.item||'';
+    tr.querySelector('.printing').value=r.printing||'';
+    const sellInput=tr.querySelector('.selling');
+    sellInput.dataset.raw=r.selling||'';
+    if(r.selling){
+      const n=parseFloat(r.selling);
+      sellInput.value=isNaN(n)?r.selling:n.toLocaleString('en-PH',{minimumFractionDigits:0,maximumFractionDigits:2});
+    }
+    tr.querySelector('.qty').value=r.qty||'';
+    if(r.imgSrc){
+      const btn=tr.querySelector('.img-upload-btn');
+      btn.querySelector('img').src=r.imgSrc;
+      btn.classList.add('has-img');
+    }
+  });
+
+  // Goods
+  document.getElementById('goodsBody').innerHTML='';
+  if(data.goodsVisible){
+    document.getElementById('goodsSection').style.display='block';
+    document.getElementById('addGoodsBtn').style.display='none';
+    (data.goodsRows||[]).forEach(r=>{
+      addGoodsRow();
+      const tr=document.getElementById('goodsBody').lastElementChild;
+      tr.querySelector('input[type="text"]').value=r.item||'';
+      tr.querySelector('.g-qty').value=r.qty||'';
+      tr.querySelector('.g-unit').value=r.unit||'';
+    });
+    calcGoods();
+  } else {
+    document.getElementById('goodsSection').style.display='none';
+    document.getElementById('addGoodsBtn').style.display='block';
+  }
+
+  calculate();
+}
+
+/* ══ TABS ══ */
+function renderTabs(){
+  const bar=document.getElementById('tabsBar');
+  const addBtn=bar.querySelector('.add-tab-btn');
+  bar.querySelectorAll('.tab-btn').forEach(b=>b.remove());
+  tabs.forEach(tab=>{
+    const btn=document.createElement('div');
+    btn.className='tab-btn'+(tab.id===activeTabId?' active':'');
+    btn.dataset.id=tab.id;
+    btn.innerHTML=`
+      <span class="tab-name" ondblclick="renameTab('${tab.id}',this)">${tab.name}</span>
+      ${tabs.length>1?`<button class="tab-close" onclick="closeTab('${tab.id}',event)" title="Close">×</button>`:''}
+    `;
+    btn.addEventListener('click',function(e){
+      if(e.target.classList.contains('tab-close')) return;
+      if(e.target.classList.contains('tab-name-input')) return;
+      switchTab(tab.id);
+    });
+    bar.insertBefore(btn,addBtn);
+  });
+}
+
+function addTab(){
+  // save current first
+  if(activeTabId){
+    const cur=tabs.find(t=>t.id===activeTabId);
+    if(cur) cur.data=collectCurrentData();
+  }
+  const id=uid();
+  const num=tabs.length+1;
+  tabs.push({id,name:`Quote ${num}`,data:{date:new Date().toISOString().split('T')[0],sigName3:'RAM MIRCH',rows:[{}]}});
+  activeTabId=id;
+  renderTabs();
+  loadDataIntoUI(tabs.find(t=>t.id===id).data);
+  addRow();
+  saveAll();
+}
+
+function switchTab(id){
+  if(id===activeTabId) return;
+  if(activeTabId){
+    const cur=tabs.find(t=>t.id===activeTabId);
+    if(cur) cur.data=collectCurrentData();
+  }
+  activeTabId=id;
+  renderTabs();
+  const tab=tabs.find(t=>t.id===id);
+  document.getElementById('tableBody').innerHTML='';
+  document.getElementById('goodsBody').innerHTML='';
+  loadDataIntoUI(tab.data);
+}
+
+function closeTab(id,e){
+  e.stopPropagation();
+  if(tabs.length===1){alert('Need at least one tab.');return;}
+  if(!confirm('Close this quotation tab?')) return;
+  const idx=tabs.findIndex(t=>t.id===id);
+  tabs.splice(idx,1);
+  if(activeTabId===id){
+    activeTabId=tabs[Math.max(0,idx-1)].id;
+    const tab=tabs.find(t=>t.id===activeTabId);
+    document.getElementById('tableBody').innerHTML='';
+    document.getElementById('goodsBody').innerHTML='';
+    loadDataIntoUI(tab.data);
+  }
+  renderTabs();
+  saveAll();
+}
+
+function renameTab(id,el){
+  const tab=tabs.find(t=>t.id===id);
+  if(!tab) return;
+  const input=document.createElement('input');
+  input.className='tab-name-input';
+  input.value=tab.name;
+  el.replaceWith(input);
+  input.focus();
+  input.select();
+  function done(){
+    tab.name=input.value.trim()||tab.name;
+    renderTabs();
+    saveAll();
+  }
+  input.addEventListener('blur',done);
+  input.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key==='Escape') input.blur();});
+}
+
+/* ══ EWT ══ */
 function toggleEWT(on){
   ewtEnabled=on;
   document.getElementById('ewtOffState').style.display=on?'none':'flex';
   document.getElementById('ewtOnState').style.display=on?'block':'none';
-  calculate();
+  calculate();markUnsaved();
 }
 
-function onSellingInput(input){input.dataset.raw=input.value.replace(/,/g,'');calculate();}
+/* ══ SELLING FORMAT ══ */
+function onSellingInput(input){input.dataset.raw=input.value.replace(/,/g,'');calculate();markUnsaved();}
 function onSellingBlur(input){
   const raw=parseFloat(input.dataset.raw||input.value.replace(/,/g,''));
   if(!isNaN(raw)&&input.value!=='') input.value=raw.toLocaleString('en-PH',{minimumFractionDigits:0,maximumFractionDigits:2});
@@ -398,15 +592,17 @@ function onSellingBlur(input){
 function onSellingFocus(input){input.value=input.dataset.raw||input.value.replace(/,/g,'');}
 function getSellingVal(input){return parseFloat((input.dataset.raw||input.value||'').replace(/,/g,''))||0;}
 
+/* ══ AUTO-RESIZE ══ */
 function autoResize(el){el.style.height='auto';el.style.height=el.scrollHeight+'px';}
 
+/* ══ ADD ROW ══ */
 function addRow(){
   const tbody=document.getElementById('tableBody');
   const tr=document.createElement('tr');
   tr.innerHTML=`
     <td style="vertical-align:top;padding-top:6px;">
       <textarea class="supplier-name" rows="1" placeholder=" "
-        oninput="autoResize(this);calculate()"
+        oninput="autoResize(this);calculate();markUnsaved()"
         onkeydown="handleSupplierKey(event)"></textarea>
     </td>
     <td class="img-cell">
@@ -416,13 +612,13 @@ function addRow(){
         <input type="file" accept="image/*" onchange="loadItemImage(this)">
       </div>
     </td>
-    <td><input type="number" class="item" oninput="calculate()"></td>
-    <td><input type="number" class="printing" oninput="calculate()"></td>
+    <td><input type="number" class="item" oninput="calculate();markUnsaved()"></td>
+    <td><input type="number" class="printing" oninput="calculate();markUnsaved()"></td>
     <td><input type="text" class="readonly cost" readonly></td>
     <td><input type="text" class="readonly markup" readonly></td>
     <td><input type="text" class="selling" placeholder=" "
       oninput="onSellingInput(this)" onblur="onSellingBlur(this)" onfocus="onSellingFocus(this)"></td>
-    <td><input type="number" class="qty" oninput="calculate()"></td>
+    <td><input type="number" class="qty" oninput="calculate();markUnsaved()"></td>
     <td><input type="text" class="readonly totalSelling" readonly></td>
     <td><input type="text" class="readonly totalCostAmt" readonly></td>
     <td><input type="text" class="readonly profit" readonly></td>
@@ -431,7 +627,7 @@ function addRow(){
       <div class="profit-pct-round" style="font-size:.7rem;color:var(--gray);line-height:1.2;"></div>
     </td>
     <td class="no-print">
-      <button class="btn-danger-sm" onclick="this.closest('tr').remove();calculate();">×</button>
+      <button class="btn-danger-sm" onclick="this.closest('tr').remove();calculate();markUnsaved();">×</button>
     </td>`;
   tbody.appendChild(tr);
 }
@@ -451,6 +647,7 @@ function loadItemImage(input){
     const btn=input.closest('.img-upload-btn');
     btn.querySelector('img').src=e.target.result;
     btn.classList.add('has-img');
+    markUnsaved();
   };
   reader.readAsDataURL(input.files[0]);
 }
@@ -464,29 +661,56 @@ function createRows(){
 }
 
 function deleteAllRows(){
-  if(!confirm('Delete all rows?')) return;
+  if(!confirm('Delete all rows and clear all fields?')) return;
+  // Clear table
   document.getElementById('tableBody').innerHTML='';
+  // Clear doc info fields
+  document.getElementById('docDate').value=new Date().toISOString().split('T')[0];
+  document.getElementById('docClient').value='';
+  document.getElementById('docProject').value='';
+  document.getElementById('docRef').value='';
+  document.getElementById('docQuotation').value='';
+  document.querySelectorAll('.doc-field textarea').forEach(t=>autoResize(t));
+  // Clear expense
+  document.getElementById('expensePercent').value='';
+  // Clear signatures (except Ram Mirch)
+  document.getElementById('sigName0').value='';
+  document.getElementById('sigName1').value='';
+  document.getElementById('sigName2').value='';
+  document.getElementById('sigName3').value='RAM MIRCH';
+  // Hide goods breakdown
+  document.getElementById('goodsSection').style.display='none';
+  document.getElementById('addGoodsBtn').style.display='block';
+  document.getElementById('goodsBody').innerHTML='';
+  // Reset EWT
+  ewtEnabled=false;
+  document.getElementById('ewtOffState').style.display='flex';
+  document.getElementById('ewtOnState').style.display='none';
   calculate();
+  markUnsaved();
 }
 
+/* ══ GOODS ══ */
 function showGoods(){
   document.getElementById('goodsSection').style.display='block';
   document.getElementById('addGoodsBtn').style.display='none';
   if(!document.getElementById('goodsBody').children.length){addGoodsRow();addGoodsRow();addGoodsRow();}
+  markUnsaved();
 }
 function hideGoods(){
   document.getElementById('goodsSection').style.display='none';
   document.getElementById('addGoodsBtn').style.display='block';
+  markUnsaved();
 }
 function addGoodsRow(){
   const tbody=document.getElementById('goodsBody');
   const tr=document.createElement('tr');
   tr.innerHTML=`
-    <td><input type="text" placeholder=" " style="min-width:140px;border:1px solid transparent;border-radius:4px;padding:4px 6px;width:100%;font-size:.78rem;background:transparent;"></td>
-    <td><input type="number" class="g-qty" oninput="calcGoods()" style="border:1px solid transparent;border-radius:4px;padding:4px 5px;width:100%;font-size:.78rem;background:transparent;"></td>
-    <td><input type="number" class="g-unit" oninput="calcGoods()" style="border:1px solid transparent;border-radius:4px;padding:4px 5px;width:100%;font-size:.78rem;background:transparent;"></td>
+    <td><input type="text" placeholder=" " style="min-width:140px;border:1px solid transparent;border-radius:4px;padding:4px 6px;width:100%;font-size:.78rem;background:transparent;" oninput="markUnsaved()"></td>
+    <td><input type="number" class="g-qty" oninput="calcGoods();markUnsaved()" style="border:1px solid transparent;border-radius:4px;padding:4px 5px;width:100%;font-size:.78rem;background:transparent;"></td>
+    <td><input type="number" class="g-unit" oninput="calcGoods();markUnsaved()" style="border:1px solid transparent;border-radius:4px;padding:4px 5px;width:100%;font-size:.78rem;background:transparent;"></td>
     <td><input type="text" class="readonly g-total" readonly style="background:#f8fafc;border:none;padding:4px 5px;width:100%;font-size:.78rem;color:#6b7280;"></td>
-    <td class="no-print"><button class="btn-danger-sm" onclick="this.closest('tr').remove();calcGoods();">×</button></td>`;
+    <td class="no-print"><button class="btn-danger-sm" onclick="this.closest('tr').remove();calcGoods();markUnsaved();">×</button></td>`;
   tbody.appendChild(tr);
 }
 function calcGoods(){
@@ -496,7 +720,7 @@ function calcGoods(){
     const u=parseFloat(row.querySelector('.g-unit')?.value)||0;
     const t=q*u;
     if(row.querySelector('.g-total')) row.querySelector('.g-total').value=t?peso(t):'';
-    tQty+=q; tCost+=t;
+    tQty+=q;tCost+=t;
   });
   document.getElementById('goodsTotalQty').innerText=tQty||'';
   document.getElementById('goodsTotalCost').innerText=tCost?'₱'+peso(tCost):'';
@@ -504,6 +728,7 @@ function calcGoods(){
   document.getElementById('goodsEwtV1').innerText=tCost?'₱'+peso(tCost*0.01):'';
 }
 
+/* ══ CALCULATE ══ */
 function calculate(){
   let tQty=0,tSelling=0,tCost=0,tProfit=0;
   document.querySelectorAll('#tableBody tr').forEach(row=>{
@@ -514,15 +739,12 @@ function calculate(){
     const qty=parseFloat(row.querySelector('.qty').value)||0;
     const hasInput=row.querySelector('.item').value!==''||row.querySelector('.printing').value!=='';
     const cost=hasInput?item+pdm:null;
-
     row.querySelector('.cost').value=cost!==null?peso(cost):'';
     row.querySelector('.markup').value=cost!==null?peso(cost*1.4):'';
-
     const rowSelling=selling*qty;
     row.querySelector('.totalSelling').value=rowSelling?peso(rowSelling):'';
     const rowCost=cost!==null?cost*qty:null;
     row.querySelector('.totalCostAmt').value=rowCost!==null?peso(rowCost):'';
-
     const profit=rowCost!==null?rowSelling-rowCost:rowSelling;
     row.querySelector('.profit').value=(rowSelling||rowCost)?peso(profit):'';
     const pPct=rowSelling>0?(profit/rowSelling)*100:0;
@@ -530,35 +752,28 @@ function calculate(){
     const pctRound=row.querySelector('.profit-pct-round');
     if(rowSelling){pctCell.innerText=pPct.toFixed(2)+'%';pctRound.innerText='('+Math.round(pPct)+'%)';}
     else{pctCell.innerText='';pctRound.innerText='';}
-
-    tQty+=qty; tSelling+=rowSelling;
+    tQty+=qty;tSelling+=rowSelling;
     if(rowCost!==null) tCost+=rowCost;
     tProfit+=profit;
   });
-
   document.getElementById('totalQty').innerText=tQty;
   document.getElementById('totalSelling').innerText='₱'+peso(tSelling);
   document.getElementById('totalCost').innerText='₱'+peso(tCost);
-
   const grossMargin=tSelling>0?(tProfit/tSelling)*100:0;
   document.getElementById('grossProfit').innerText='₱'+peso(tProfit);
   document.getElementById('grossMargin').innerText=grossMargin.toFixed(2)+'% ('+Math.round(grossMargin)+'%)';
-
   const expPct=parseFloat(document.getElementById('expensePercent').value)||0;
   const expAmt=tSelling*(expPct/100);
   const netProfit=tProfit-expAmt;
   const netMargin=tSelling>0?(netProfit/tSelling)*100:0;
   const netAfterTax=netMargin-10;
-
   document.getElementById('expenseAmount').innerText='₱'+peso(expAmt);
   document.getElementById('netProfit').innerText='₱'+peso(netProfit);
   document.getElementById('netMargin').innerText=netAfterTax.toFixed(2)+'% ('+Math.round(netAfterTax)+'%)';
-
   ['grossProfit','netProfit'].forEach(id=>{
     const el=document.getElementById(id);
     el.className='metric-value '+(pParse(el.innerText)>=0?'profit':'loss');
   });
-
   if(ewtEnabled){
     const ewtPct=parseFloat(document.getElementById('ewtPercent').value)||0;
     const ewtAmt=tSelling*(ewtPct/100);
@@ -566,6 +781,7 @@ function calculate(){
   }
 }
 
+/* ══ ENTER KEY NAV ══ */
 document.addEventListener('keydown',function(e){
   if(e.key!=='Enter') return;
   const cur=document.activeElement;
@@ -573,16 +789,41 @@ document.addEventListener('keydown',function(e){
   if(!editables.some(c=>cur.classList.contains(c))) return;
   if(cur.hasAttribute('readonly')) return;
   e.preventDefault();
-  const row=cur.closest('tr'); if(!row) return;
+  const row=cur.closest('tr');if(!row) return;
   const field=editables.find(f=>cur.classList.contains(f));
-  const next=row.nextElementSibling; if(!next) return;
+  const next=row.nextElementSibling;if(!next) return;
   const target=next.querySelector('.'+field);
   if(target){target.focus();target.select?.();}
 });
 
+/* ══ INIT ══ */
 window.onload=function(){
+  const saved=localStorage.getItem(STORAGE_KEY);
+  if(saved){
+    try{
+      const parsed=JSON.parse(saved);
+      tabs=parsed.tabs||[];
+      activeTabId=parsed.activeTabId||null;
+      if(tabs.length&&activeTabId){
+        renderTabs();
+        const tab=tabs.find(t=>t.id===activeTabId)||tabs[0];
+        activeTabId=tab.id;
+        loadDataIntoUI(tab.data);
+        renderTabs();
+        markSaved();
+        return;
+      }
+    }catch(e){}
+  }
+  // Fresh start
+  const id=uid();
+  tabs=[{id,name:'Quote 1',data:{}}];
+  activeTabId=id;
+  renderTabs();
   document.getElementById('docDate').value=new Date().toISOString().split('T')[0];
+  document.getElementById('sigName3').value='RAM MIRCH';
   addRow();
+  markSaved();
 };
 </script>
 </body>
