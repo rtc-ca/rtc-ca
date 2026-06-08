@@ -919,16 +919,34 @@ function exportImage(){
   document.head.appendChild(styleTag);
 
   setTimeout(()=>{
+    // Inject temporary header into mainContent
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('en-PH',{year:'numeric',month:'long',day:'numeric'});
+    const timeStr = now.toLocaleTimeString('en-PH',{hour:'2-digit',minute:'2-digit'});
+
+    const imgHeader = document.createElement('div');
+    imgHeader.id = 'img-export-header';
+    imgHeader.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 16px 8px;border-bottom:3px solid #7b0d0d;margin-bottom:8px;background:#fff;">
+        <div style="font-family:'Playfair Display',serif;color:#7b0d0d;font-size:1.3rem;font-weight:900;letter-spacing:-0.3px;">RTC Cost Analysis</div>
+        <div style="font-size:.72rem;color:#6b7280;text-align:right;">
+          <div>${dateStr}</div>
+          <div>${timeStr}</div>
+        </div>
+      </div>`;
     const target = document.getElementById('mainContent');
+    target.insertBefore(imgHeader, target.firstChild);
+
     html2canvas(target, {
       scale: 2,
       useCORS: true,
       backgroundColor: '#ffffff',
       scrollX: 0,
       scrollY: 0,
-      windowWidth: 1122, // ~letter landscape width in px at 96dpi
+      windowWidth: 1122,
     }).then(canvas => {
       // cleanup
+      imgHeader.remove();
       document.body.classList.remove('printing-image');
       document.getElementById('img-print-style')?.remove();
       btn.innerText = '🖼 Export Image';
@@ -939,6 +957,7 @@ function exportImage(){
       link.href = canvas.toDataURL('image/png');
       link.click();
     }).catch(()=>{
+      imgHeader.remove();
       document.body.classList.remove('printing-image');
       document.getElementById('img-print-style')?.remove();
       btn.innerText = '🖼 Export Image';
