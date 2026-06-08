@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<head> 
+<head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RTC Cost Analysis</title>
@@ -225,12 +225,15 @@ table.cost-table{width:100%;border-collapse:collapse;font-size:.78rem;}
 
   <!-- DOC INFO -->
   <div class="doc-info-card">
-    <div class="doc-info-grid">
-      <div class="doc-field"><label>Date</label><input type="date" id="docDate" oninput="markUnsaved()"></div>
-      <div class="doc-field"><label>Client</label><textarea id="docClient" placeholder=" " rows="1" oninput="autoResize(this);markUnsaved()"></textarea></div>
-      <div class="doc-field"><label>Name of Project</label><textarea id="docProject" placeholder=" " rows="1" oninput="autoResize(this);markUnsaved()"></textarea></div>
-      <div class="doc-field"><label>Ref No.</label><textarea id="docRef" placeholder=" " rows="1" oninput="autoResize(this);markUnsaved()"></textarea></div>
-      <div class="doc-field"><label>Quotation Number</label><textarea id="docQuotation" placeholder=" " rows="1" oninput="autoResize(this);markUnsaved()"></textarea></div>
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;">
+      <div class="doc-info-grid" style="flex:1;">
+        <div class="doc-field"><label>Date</label><input type="date" id="docDate" oninput="markUnsaved()"></div>
+        <div class="doc-field"><label>Client</label><textarea id="docClient" placeholder=" " rows="1" oninput="autoResize(this);markUnsaved()"></textarea></div>
+        <div class="doc-field"><label>Name of Project</label><textarea id="docProject" placeholder=" " rows="1" oninput="autoResize(this);markUnsaved()"></textarea></div>
+        <div class="doc-field"><label>Ref No.</label><textarea id="docRef" placeholder=" " rows="1" oninput="autoResize(this);markUnsaved()"></textarea></div>
+        <div class="doc-field"><label>Quotation Number</label><textarea id="docQuotation" placeholder=" " rows="1" oninput="autoResize(this);markUnsaved()"></textarea></div>
+      </div>
+      <button onclick="clearAllFields()" class="btn-danger-sm no-print" style="white-space:nowrap;margin-top:18px;flex-shrink:0;">✕ Clear</button>
     </div>
   </div>
 
@@ -667,32 +670,23 @@ function createRows(){
 }
 
 function deleteAllRows(){
-  if(!confirm('Delete all rows and clear all fields?')) return;
-  // Clear table
+  if(!confirm('Delete all rows?')) return;
   document.getElementById('tableBody').innerHTML='';
-  // Clear doc info fields
-  document.getElementById('docDate').value=getTodayDate();
+  document.getElementById('goodsSection').style.display='none';
+  document.getElementById('addGoodsBtn').style.display='block';
+  document.getElementById('goodsBody').innerHTML='';
+  calculate();
+  markUnsaved();
+}
+
+function clearAllFields(){
+  if(!confirm('Clear all header fields (Client, Project, Ref No., Quotation Number)?')) return;
+  document.getElementById('docDate').value=new Date().toISOString().split('T')[0];
   document.getElementById('docClient').value='';
   document.getElementById('docProject').value='';
   document.getElementById('docRef').value='';
   document.getElementById('docQuotation').value='';
   document.querySelectorAll('.doc-field textarea').forEach(t=>autoResize(t));
-  // Clear expense
-  document.getElementById('expensePercent').value='';
-  // Clear signatures (except Ram Mirch)
-  document.getElementById('sigName0').value='';
-  document.getElementById('sigName1').value='';
-  document.getElementById('sigName2').value='';
-  document.getElementById('sigName3').value='RAM MIRCH';
-  // Hide goods breakdown
-  document.getElementById('goodsSection').style.display='none';
-  document.getElementById('addGoodsBtn').style.display='block';
-  document.getElementById('goodsBody').innerHTML='';
-  // Reset EWT
-  ewtEnabled=false;
-  document.getElementById('ewtOffState').style.display='flex';
-  document.getElementById('ewtOnState').style.display='none';
-  calculate();
   markUnsaved();
 }
 
