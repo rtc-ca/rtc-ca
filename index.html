@@ -160,6 +160,7 @@ table.cost-table{width:100%;border-collapse:collapse;font-size:.78rem;}
   .metric input{display:none !important;}
   .ewt-toggle-row{flex-direction:column !important;align-items:flex-start !important;padding:3pt 5pt !important;border-bottom:none !important;border-right:1px solid #eee !important;}
   .ewt-inputs input[type="number"],.ewt-toggle-row button,#ewtOffState{display:none !important;}
+  #netMarginWarn{display:block !important;}
   .main-card,.goods-card,.doc-info-card{box-shadow:none !important;border-radius:0 !important;}
   .main-card{border:1px solid #ccc !important;}
   .main-card .card-body{padding:6pt !important;}
@@ -306,6 +307,9 @@ table.cost-table{width:100%;border-collapse:collapse;font-size:.78rem;}
           <div class="metric"><small>Net Profit</small><div id="netProfit" class="metric-value profit">₱0.00</div></div>
           <div class="metric"><small>Tax (10%)</small><div class="metric-value">10%</div></div>
           <div class="metric"><small>Net Margin</small><div id="netMargin" class="metric-value">0%</div></div>
+          <div id="netMarginWarn" style="display:none;padding:4px 0 6px;border-bottom:1px solid #f0f0f0;">
+            <div id="netMarginMsg" style="font-size:.7rem;font-weight:700;"></div>
+          </div>
           <div class="ewt-toggle-row" id="ewtRow">
             <small>EWT (by RTC)</small>
             <div id="ewtOffState" style="display:flex;align-items:center;gap:6px;margin-top:4px;">
@@ -771,10 +775,42 @@ function calculate(){
   const netAfterTax=netMargin-10;
   document.getElementById('expenseAmount').innerText='₱'+peso(expAmt);
   document.getElementById('netProfit').innerText='₱'+peso(netProfit);
-  document.getElementById('netMargin').innerText=netAfterTax.toFixed(2)+'% ('+Math.round(netAfterTax)+'%)';
+
+  const netMarginEl=document.getElementById('netMargin');
+  const netMarginWarn=document.getElementById('netMarginWarn');
+  const netMarginMsg=document.getElementById('netMarginMsg');
+  const rounded=Math.round(netAfterTax);
+
+  if(tSelling>0){
+    if(rounded<20){
+      netMarginEl.innerText=netAfterTax.toFixed(2)+'% ('+rounded+'%)';
+      netMarginEl.style.color='#991b1b';
+      netMarginMsg.innerHTML='⚠ TOO LOW — NOT APPROVED<br><span style="font-size:.62rem;font-weight:400;">Net margin must be at least 20%</span>';
+      netMarginMsg.style.color='#991b1b';
+      // Gross profit and net profit turn red
+      document.getElementById('grossProfit').style.color='#991b1b';
+      document.getElementById('netProfit').style.color='#991b1b';
+    } else {
+      netMarginEl.innerText=netAfterTax.toFixed(2)+'% ('+rounded+'%)';
+      netMarginEl.style.color='#166534';
+      netMarginMsg.innerHTML='✓ GOOD';
+      netMarginMsg.style.color='#166534';
+      // Gross profit and net profit normal green
+      document.getElementById('grossProfit').style.color='#166534';
+      document.getElementById('netProfit').style.color='#166534';
+    }
+    netMarginWarn.style.display='block';
+  } else {
+    netMarginEl.innerText='0%';
+    netMarginEl.style.color='';
+    netMarginWarn.style.display='none';
+    document.getElementById('grossProfit').style.color='';
+    document.getElementById('netProfit').style.color='';
+  }
   ['grossProfit','netProfit'].forEach(id=>{
     const el=document.getElementById(id);
-    el.className='metric-value '+(pParse(el.innerText)>=0?'profit':'loss');
+    // only update class, color is handled above
+    el.className='metric-value';
   });
   if(ewtEnabled){
     const ewtPct=parseFloat(document.getElementById('ewtPercent').value)||0;
