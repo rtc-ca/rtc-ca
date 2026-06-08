@@ -388,7 +388,6 @@ function collectCurrentData(){
     });
   });
   return{
-    date:document.getElementById('docDate').value,
     client:document.getElementById('docClient').value,
     project:document.getElementById('docProject').value,
     ref:document.getElementById('docRef').value,
@@ -424,7 +423,7 @@ function manualSave(){saveAll();}
 /* ══ LOAD DATA INTO UI ══ */
 function loadDataIntoUI(data){
   if(!data) return;
-  document.getElementById('docDate').value=getTodayDate(); // always today
+  document.getElementById('docDate').value=getTodayDate();
   document.getElementById('docClient').value=data.client||'';
   document.getElementById('docProject').value=data.project||'';
   document.getElementById('docRef').value=data.ref||'';
