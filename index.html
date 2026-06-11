@@ -590,7 +590,14 @@ table.cost-table{width:100%;border-collapse:collapse;font-size:.78rem;}
         <span class="kbd">Shift + Enter</span> — new line in Item/Supplier field<br>
         <span class="kbd">Tab</span> — move to next cell
       </p>
-      <p><strong>Why does the PDF filename have my client name?</strong><br>The system auto-generates the filename using Client name + date for easy filing.</p>
+      <p><strong>How do I add an image to a row?</strong></p>
+      <ul>
+        <li><strong>Click the image cell</strong> — focuses the cell (enables Ctrl+V paste)</li>
+        <li><strong>Insert button</strong> — click the red Insert button inside the cell to open file picker and upload from your device</li>
+        <li><strong>Ctrl+V</strong> — click the image cell first to focus it, then press Ctrl+V to paste a copied image</li>
+        <li><strong>Right-click the image cell</strong> — shows a menu with Paste Image, Upload Image, and Remove Image options</li>
+        <li><strong>Backspace or Delete</strong> — click the image cell then press Backspace or Delete to remove the image</li>
+      </ul>
       <p><strong>Need help or suggestions?</strong><br>Contact <strong>Executive Assistant Department</strong> or <strong>Isaac</strong>.</p>
       <p><strong>How do I install this as an app?</strong></p>
       <p><strong>Option 1:</strong> Click the <strong>📲 Install App</strong> button in the header (if visible). Click Install when prompted. Once installed, you can open it like a regular app on your phone or desktop. The button disappears after installation.</p>
@@ -1083,10 +1090,21 @@ function addRow(){
         onkeydown="handleSupplierKey(event)"></textarea>
     </td>
     <td class="img-cell">
-      <div class="img-upload-btn" title="Click to upload image">
-        <span class="upload-label" style="font-size:.58rem;text-align:center;line-height:1.3;padding:4px;">📷<br>Upload</span>
+      <div class="img-upload-btn"
+        tabindex="0"
+        onkeydown="handleImgKeydown(event,this)"
+        onpaste="handleImgPasteEvent(event,this)"
+        oncontextmenu="showImgContextMenu(event,this)"
+        onclick="focusImgCell(event,this)"
+        title="Click to focus for paste | Ctrl+V to paste | Backspace to remove">
+        <span class="upload-label" style="font-size:.5rem;text-align:center;line-height:1.6;padding:2px;display:flex;flex-direction:column;align-items:center;gap:4px;">
+          <span style="color:#9ca3af;">📷 Click to Paste</span>
+          <label style="background:var(--maroon);color:#fff;border-radius:4px;padding:2px 8px;font-size:.5rem;cursor:pointer;margin-top:1px;" onclick="event.stopPropagation()">
+            Insert
+            <input type="file" accept="image/*" onchange="loadItemImage(this)" style="display:none;">
+          </label>
+        </span>
         <img alt="item">
-        <input type="file" accept="image/*" onchange="loadItemImage(this)">
       </div>
     </td>
     <td><input type="number" class="item" oninput="calculate();markUnsaved()"></td>
@@ -1130,11 +1148,98 @@ function loadItemImage(input){
   const reader=new FileReader();
   reader.onload=e=>{
     const btn=input.closest('.img-upload-btn');
-    btn.querySelector('img').src=e.target.result;
-    btn.classList.add('has-img');markUnsaved();
+    setImgOnBtn(btn,e.target.result);
+    markUnsaved();
   };
   reader.readAsDataURL(input.files[0]);
 }
+
+function setImgOnBtn(btn,src){
+  btn.querySelector('img').src=src;
+  btn.querySelector('img').style.display='';
+  btn.classList.add('has-img');
+}
+
+function focusImgCell(e,btn){
+  e.preventDefault();
+  btn.focus();
+}
+
+function handleImgKeydown(e,btn){
+  // Backspace or Delete = remove image
+  if(e.key==='Backspace'||e.key==='Delete'){
+    e.preventDefault();
+    removeImg(btn);
+    return;
+  }
+}
+
+function handleImgPasteEvent(e,btn){
+  const items=e.clipboardData?.items;
+  if(!items)return;
+  for(const item of items){
+    if(item.type.startsWith('image/')){
+      e.preventDefault();
+      const blob=item.getAsFile();
+      const reader=new FileReader();
+      reader.onload=ev=>{setImgOnBtn(btn,ev.target.result);markUnsaved();};
+      reader.readAsDataURL(blob);
+      return;
+    }
+  }
+}
+
+/* Context menu for paste */
+let _ctxBtn=null;
+function showImgContextMenu(e,btn){
+  e.preventDefault();
+  _ctxBtn=btn;
+  btn.focus();
+  let menu=document.getElementById('imgContextMenu');
+  if(!menu){
+    menu=document.createElement('div');
+    menu.id='imgContextMenu';
+    menu.style.cssText='position:fixed;background:#fff;border:1px solid #e5e7eb;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,.12);z-index:9999;min-width:150px;padding:4px 0;font-size:.82rem;';
+    document.body.appendChild(menu);
+  }
+  menu.innerHTML=`
+    <div onclick="triggerPasteOnBtn(_ctxBtn);closeImgMenu()" style="padding:8px 14px;cursor:pointer;display:flex;align-items:center;gap:8px;" onmouseover="this.style.background='#fdf3f3'" onmouseout="this.style.background=''">
+      📋 <span>Paste Image</span>
+    </div>
+    <div onclick="_ctxBtn.querySelector('input[type=file]').click();closeImgMenu()" style="padding:8px 14px;cursor:pointer;display:flex;align-items:center;gap:8px;" onmouseover="this.style.background='#fdf3f3'" onmouseout="this.style.background=''">>
+      📁 <span>Upload Image</span>
+    </div>
+    <div onclick="removeImg(_ctxBtn);closeImgMenu()" style="padding:8px 14px;cursor:pointer;display:flex;align-items:center;gap:8px;color:#991b1b;" onmouseover="this.style.background='#fee2e2'" onmouseout="this.style.background=''">
+      🗑 <span>Remove Image</span>
+    </div>`;
+  menu.style.left=Math.min(e.clientX,window.innerWidth-160)+'px';
+  menu.style.top=Math.min(e.clientY,window.innerHeight-130)+'px';
+  menu.style.display='block';
+}
+
+function triggerPasteOnBtn(btn){
+  // Focus the btn then simulate paste via keyboard — browser will fire paste event
+  if(btn){btn.focus();document.execCommand('paste');}
+}
+
+function closeImgMenu(){
+  const menu=document.getElementById('imgContextMenu');
+  if(menu)menu.style.display='none';
+}
+
+function removeImg(btn){
+  if(!btn)return;
+  const img=btn.querySelector('img');
+  img.src='';img.style.display='none';
+  btn.classList.remove('has-img');
+  markUnsaved();
+}
+
+document.addEventListener('click',function(e){
+  if(!e.target.closest('#imgContextMenu')&&!e.target.closest('.img-upload-btn')){
+    closeImgMenu();
+  }
+});
 
 function createRows(){
   const n=parseInt(document.getElementById('rowCount').value);
