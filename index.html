@@ -107,7 +107,7 @@ table.cost-table{width:100%;border-collapse:collapse;font-size:.78rem;}
 .sig-section{background:var(--white);border:1px solid var(--border);border-radius:8px;padding:20px 24px 16px;margin-top:14px;box-shadow:0 1px 6px rgba(0,0,0,.04);}
 .sig-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:8px;}
 .sig-block{text-align:center;}
-.sig-space{height:50px;border-bottom:1.5px solid var(--dark);margin-bottom:6px;width:100%;}
+.sig-space{height:50px;border-bottom:1.5px solid var(--dark);margin-bottom:6px;width:70%;margin-left:auto;margin-right:auto;}
 .sig-name{border:none;border-bottom:1px solid #aaa;text-align:center;font-size:.82rem;font-weight:600;width:100%;background:transparent;outline:none;padding:2px 4px;transition:border-color .2s;display:block;}
 .sig-name:focus{border-bottom-color:var(--maroon);}
 .sig-role{font-size:.68rem;color:var(--gray);text-transform:uppercase;letter-spacing:.6px;margin-top:4px;display:block;}
@@ -185,6 +185,11 @@ table.cost-table{width:100%;border-collapse:collapse;font-size:.78rem;}
   .sig-space{height:22pt !important;margin-bottom:3pt !important;}
   .sig-name{font-size:7.5pt !important;border:none !important;border-bottom:1px solid #555 !important;width:100% !important;display:block !important;text-align:center !important;}
   .sig-name:placeholder-shown{visibility:hidden !important;}
+  .sig-role-line{display:flex !important;align-items:center !important;justify-content:center !important;gap:3pt !important;margin-top:2pt !important;}
+  .sig-role{font-size:6pt !important;margin-top:0 !important;letter-spacing:.4px !important;}
+  .sig-position{font-size:6pt !important;border:none !important;text-align:left !important;color:#333 !important;display:inline !important;width:auto !important;}
+  .sig-position:placeholder-shown{visibility:hidden !important;}
+  .sig-dropdown{display:none !important;}
   .sig-role{font-size:6pt !important;margin-top:3pt !important;letter-spacing:.4px !important;}
   .section-label{font-size:8pt !important;margin-bottom:4pt !important;padding-bottom:2pt !important;}
 }
@@ -193,7 +198,18 @@ table.cost-table{width:100%;border-collapse:collapse;font-size:.78rem;}
   .sig-grid{grid-template-columns:repeat(2,1fr);}
 }
 
-/* HELP PANEL */
+/* SIGNATURE POSITION & DROPDOWN */
+.sig-role-line{display:flex;align-items:flex-start;gap:4px;margin-top:4px;justify-content:center;flex-wrap:nowrap;}
+.sig-role-line .sig-role{white-space:nowrap;margin:0;padding-top:3px;flex-shrink:0;}
+.sig-position{border:none;border-bottom:1px solid #ddd;font-size:.68rem;background:transparent;outline:none;padding:1px 4px;color:var(--dark);font-family:inherit;min-width:120px;width:160px;text-align:left;resize:none;overflow:hidden;line-height:1.4;}
+.sig-position:focus{border-bottom-color:var(--maroon);}
+.sig-dropdown{position:absolute;top:100%;left:0;right:0;background:var(--white);border:1px solid var(--border);border-radius:6px;box-shadow:0 4px 12px rgba(0,0,0,.1);z-index:100;display:none;max-height:160px;overflow-y:auto;}
+.sig-dropdown.open{display:block;}
+.sig-drop-item{padding:8px 10px;font-size:.8rem;cursor:pointer;border-bottom:1px solid #f0f0f0;transition:background .15s;}
+.sig-drop-item:last-child{border-bottom:none;}
+.sig-drop-item:hover{background:var(--maroon-pale);color:var(--maroon);}
+.sig-drop-name{font-weight:600;color:var(--dark);font-size:.8rem;}
+.sig-drop-pos{font-size:.7rem;color:var(--gray);}
 .help-panel{position:fixed;top:56px;right:16px;width:360px;max-height:calc(100vh - 80px);background:var(--white);border:1px solid var(--border);border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,.15);z-index:9999;display:none;flex-direction:column;overflow:hidden;}
 .help-panel.open{display:flex;}
 .help-header{background:var(--maroon);color:#fff;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;}
@@ -247,6 +263,7 @@ table.cost-table{width:100%;border-collapse:collapse;font-size:.78rem;}
     <span class="save-status" id="saveStatus">All changes saved</span>
     <button class="btn-green" onclick="manualSave()">💾 Save</button>
     <button id="installBtn" class="btn-outline-maroon" onclick="installApp()" style="display:none;">📲 Install App</button>
+    <button class="btn-outline-maroon" onclick="toggleSettings()">⚙ Settings</button>
     <button class="btn-outline-maroon" onclick="toggleHelp()">Help?</button>
     <button class="btn-maroon" onclick="exportPDF()">⬇ Export PDF</button>
   </div>
@@ -396,13 +413,103 @@ table.cost-table{width:100%;border-collapse:collapse;font-size:.78rem;}
   <div class="sig-section">
     <div class="section-label sig-label">Authorized Signatories</div>
     <div class="sig-grid">
-      <div class="sig-block"><div class="sig-space"></div><input type="text" class="sig-name" id="sigName0" placeholder=" " oninput="markUnsaved()"><span class="sig-role">Prepared by</span></div>
-      <div class="sig-block"><div class="sig-space"></div><input type="text" class="sig-name" id="sigName1" placeholder=" " oninput="markUnsaved()"><span class="sig-role">Noted by</span></div>
-      <div class="sig-block"><div class="sig-space"></div><input type="text" class="sig-name" id="sigName2" placeholder=" " oninput="markUnsaved()"><span class="sig-role">Check by Acctg.</span></div>
-      <div class="sig-block"><div class="sig-space"></div><input type="text" class="sig-name" id="sigName3" value="RAM MIRCH" placeholder=" " oninput="markUnsaved()"><span class="sig-role">Approved by — CSO</span></div>
+
+      <div class="sig-block">
+        <div class="sig-space"></div>
+        <div style="position:relative;">
+          <input type="text" class="sig-name" id="sigName0" placeholder=" " oninput="markUnsaved();filterSigDropdown(0)" autocomplete="off">
+          <div id="sigDrop0" class="sig-dropdown"></div>
+        </div>
+        <div class="sig-role-line">
+          <span class="sig-role">Prepared by :</span>
+          <textarea class="sig-position" id="sigPos0" placeholder="Position" rows="1" oninput="markUnsaved();autoResize(this)"></textarea>
+        </div>
+      </div>
+
+      <div class="sig-block">
+        <div class="sig-space"></div>
+        <div style="position:relative;">
+          <input type="text" class="sig-name" id="sigName1" placeholder=" " oninput="markUnsaved();filterSigDropdown(1)" autocomplete="off">
+          <div id="sigDrop1" class="sig-dropdown"></div>
+        </div>
+        <div class="sig-role-line">
+          <span class="sig-role">Noted by :</span>
+          <textarea class="sig-position" id="sigPos1" placeholder="Position" rows="1" oninput="markUnsaved();autoResize(this)"></textarea>
+        </div>
+      </div>
+
+      <div class="sig-block">
+        <div class="sig-space"></div>
+        <input type="text" class="sig-name" id="sigName2" placeholder=" " oninput="markUnsaved()">
+        <span class="sig-role">Check by Acctg.</span>
+      </div>
+
+      <div class="sig-block">
+        <div class="sig-space"></div>
+        <input type="text" class="sig-name" id="sigName3" value="RAM MIRCH" placeholder=" " oninput="markUnsaved()">
+        <span class="sig-role">Approved by — CSO</span>
+      </div>
+
     </div>
   </div>
 
+</div>
+
+<!-- SETTINGS PANEL -->
+<div class="help-panel no-print" id="settingsPanel">
+  <div class="help-header">
+    <h3>⚙ Settings</h3>
+    <button class="help-close" onclick="toggleSettings()">✕</button>
+  </div>
+  <div class="help-body" style="padding:20px;">
+
+    <h4 style="margin-bottom:14px;">Font Settings</h4>
+    <p style="margin-bottom:6px;font-size:.78rem;color:var(--gray);text-transform:uppercase;letter-spacing:.6px;font-weight:600;">Font Style</p>
+    <select id="fontStyleSelect" onchange="applyFontSettings()" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:7px 10px;font-size:.85rem;margin-bottom:14px;outline:none;color:var(--dark);">
+      <option value="Arial,sans-serif" selected>Arial (Default)</option>
+      <option value="'DM Sans',sans-serif">DM Sans</option>
+      <option value="Calibri,sans-serif">Calibri</option>
+    </select>
+
+    <p style="margin-bottom:6px;font-size:.78rem;color:var(--gray);text-transform:uppercase;letter-spacing:.6px;font-weight:600;">Font Size: <span id="fontSizeLabel">12px</span></p>
+    <input type="range" id="fontSizeRange" min="10" max="15" value="12" oninput="applyFontSettings()" style="width:100%;accent-color:var(--maroon);margin-bottom:4px;">
+    <div style="display:flex;justify-content:space-between;font-size:.7rem;color:var(--gray);margin-bottom:14px;"><span>10px</span><span>15px</span></div>
+
+    <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:.85rem;margin-bottom:4px;">
+      <input type="checkbox" id="boldToggle" onchange="applyFontSettings()" style="accent-color:var(--maroon);width:16px;height:16px;">
+      <span>Bold Text</span>
+    </label>
+    <p style="font-size:.7rem;color:var(--gray);margin-bottom:18px;font-style:italic;">⚠ Font size has no effect on PDF export. Bold is included.</p>
+
+    <button onclick="resetFontSettings()" class="btn-danger-sm" style="width:100%;padding:7px;margin-bottom:20px;">Reset to Default</button>
+
+    <hr style="border-color:var(--border);margin-bottom:16px;">
+
+    <h4 style="margin-bottom:4px;">Signatory Names</h4>
+    <p style="font-size:.72rem;color:var(--gray);margin-bottom:14px;">First in list = default (auto-fills all tabs). Click ↑ to reorder.</p>
+
+    <!-- PREPARED BY -->
+    <p style="font-size:.75rem;font-weight:700;color:var(--maroon);margin-bottom:6px;">Prepared by</p>
+    <div id="prepList" style="margin-bottom:8px;"></div>
+    <input type="text" id="settingsPrepName" placeholder="Name" style="border:none;border-bottom:1.5px solid var(--border);padding:4px 2px;font-size:.82rem;width:100%;background:transparent;outline:none;margin-bottom:5px;font-family:inherit;">
+    <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;">
+      <span style="font-size:.75rem;color:var(--gray);white-space:nowrap;">Prepared by :</span>
+      <input type="text" id="settingsPrepPos" placeholder="Position" style="border:none;border-bottom:1.5px solid var(--border);padding:4px 2px;font-size:.82rem;flex:1;background:transparent;outline:none;font-family:inherit;">
+    </div>
+    <button onclick="addSigContact('prepared')" class="btn-outline-maroon" style="width:100%;padding:6px;font-size:.78rem;margin-bottom:16px;">+ Add Name</button>
+
+    <!-- NOTED BY -->
+    <p style="font-size:.75rem;font-weight:700;color:var(--maroon);margin-bottom:6px;">Noted by</p>
+    <div id="notedList" style="margin-bottom:8px;"></div>
+    <input type="text" id="settingsNotedName" placeholder="Name" style="border:none;border-bottom:1.5px solid var(--border);padding:4px 2px;font-size:.82rem;width:100%;background:transparent;outline:none;margin-bottom:5px;font-family:inherit;">
+    <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;">
+      <span style="font-size:.75rem;color:var(--gray);white-space:nowrap;">Noted by :</span>
+      <input type="text" id="settingsNotedPos" placeholder="Position" style="border:none;border-bottom:1.5px solid var(--border);padding:4px 2px;font-size:.82rem;flex:1;background:transparent;outline:none;font-family:inherit;">
+    </div>
+    <button onclick="addSigContact('noted')" class="btn-outline-maroon" style="width:100%;padding:6px;font-size:.78rem;margin-bottom:8px;">+ Add Name</button>
+    <div id="sigSaveMsg" style="font-size:.72rem;color:#166534;display:none;text-align:center;padding:4px 0;"></div>
+
+  </div>
 </div>
 
 <!-- HELP PANEL -->
@@ -416,6 +523,7 @@ table.cost-table{width:100%;border-collapse:collapse;font-size:.78rem;}
     <button class="help-tab" onclick="showHelpTab(1)">Field Guide</button>
     <button class="help-tab" onclick="showHelpTab(2)">Net Margin</button>
     <button class="help-tab" onclick="showHelpTab(3)">FAQ</button>
+    <button class="help-tab" onclick="showHelpTab(4)">Settings</button>
   </div>
   <div class="help-body">
 
@@ -484,13 +592,227 @@ table.cost-table{width:100%;border-collapse:collapse;font-size:.78rem;}
       </p>
       <p><strong>Why does the PDF filename have my client name?</strong><br>The system auto-generates the filename using Client name + date for easy filing.</p>
       <p><strong>Need help or suggestions?</strong><br>Contact <strong>Executive Assistant Department</strong> or <strong>Isaac</strong>.</p>
-      <p><strong>How do I install this as an app?</strong><br>Click the <em>📲 Install App</em> button in the header. Once installed, you can open it like a regular app on your phone or desktop. The button disappears after installation. Option 2. On Chrome click the 3 dots on right side, click "cast, save, and share" , then click "install page as app" then done/install </p>
+      <p><strong>How do I install this as an app?</strong></p>
+      <p><strong>Option 1:</strong> Click the <strong>📲 Install App</strong> button in the header (if visible). Click Install when prompted. Once installed, you can open it like a regular app on your phone or desktop. The button disappears after installation.</p>
+      <p><strong>Option 2:</strong> On Google Chrome, click the <strong>three dots (⋮)</strong> on the top right corner of the browser. In the menu, click <strong>"Cast, save, and share"</strong>. Then click <strong>"Install page as app"</strong>. A dialog will appear — click <strong>"Install"</strong> or <strong>"Done"</strong>. The app will be added to your desktop or home screen.</p>
+    </div>
+
+    <!-- SETTINGS GUIDE -->
+    <div class="help-section" id="helpTab4">
+      <h4>Settings Guide</h4>
+      <p><strong>How to open Settings</strong><br>Click the <strong>⚙ Settings</strong> button in the header.</p>
+      <p><strong>Font Style</strong><br>Choose between Arial, DM Sans, or Calibri. Changes apply immediately to all text on screen.</p>
+      <p><strong>Font Size</strong><br>Drag the slider between 10px and 15px. Default is 12px. <em>Font size has no effect on PDF export.</em></p>
+      <p><strong>Bold Text</strong><br>Toggle bold on or off. Bold is included in PDF export.</p>
+      <p><strong>Reset to Default</strong><br>Resets font to Arial, size to 12px, bold off.</p>
+      <p><strong>Signatory Names</strong><br>Save names and positions for Prepared by and Noted by.</p>
+      <ul>
+        <li>Type a name and position, then click <strong>+ Add Name</strong></li>
+        <li><strong>First in the list = DEFAULT</strong> — auto-fills all tabs including new ones</li>
+        <li>Click <strong>↑</strong> to move a name up (make it default)</li>
+        <li>Click <strong>✕</strong> to delete a name</li>
+        <li>In the signature section, type a name to see dropdown suggestions</li>
+        <li>Click a suggestion to auto-fill name and position</li>
+      </ul>
     </div>
 
   </div>
 </div>
 
 <script>
+/* ══ SETTINGS ══ */
+const SETTINGS_KEY='rtc_settings_v1';
+const SIG_CONTACTS_KEY='rtc_sig_contacts_v1';
+
+function toggleSettings(){
+  const p=document.getElementById('settingsPanel');
+  p.classList.toggle('open');
+  if(p.classList.contains('open')) setTimeout(()=>loadSettingsSigPanel(),50);
+  if(document.getElementById('helpPanel').classList.contains('open'))
+    document.getElementById('helpPanel').classList.remove('open');
+}
+
+function applyFontSettings(){
+  const font=document.getElementById('fontStyleSelect').value;
+  const size=document.getElementById('fontSizeRange').value;
+  const bold=document.getElementById('boldToggle').checked;
+  document.getElementById('fontSizeLabel').innerText=size+'px';
+  let styleTag=document.getElementById('fontSettingsStyle');
+  if(!styleTag){styleTag=document.createElement('style');styleTag.id='fontSettingsStyle';document.head.appendChild(styleTag);}
+  styleTag.innerHTML=`
+    body, body *:not(.rtc-title):not(.section-label):not(.summary-header) {
+      font-family: ${font} !important;
+      font-size: ${size}px !important;
+      font-weight: ${bold?'700':'400'} !important;
+    }
+    @media print {
+      body, body * { font-size: 14px !important; font-weight: ${bold?'700':'400'} !important; }
+      .cost-table, .cost-table * { font-size: 7pt !important; }
+      .breakdown-table, .breakdown-table * { font-size: 7pt !important; }
+      .doc-field input,.doc-field textarea { font-size: 7.5pt !important; }
+      .metric-value { font-size: .76rem !important; }
+      .metric small { font-size: .56rem !important; }
+      .rtc-title { font-family: 'Playfair Display',serif !important; font-size: 1.3rem !important; }
+    }
+    .rtc-title { font-family: 'Playfair Display', serif !important; font-weight: 900 !important; }
+    .section-label { font-family: 'Playfair Display', serif !important; font-weight: 700 !important; }
+    .summary-header { font-family: 'Playfair Display', serif !important; font-weight: 700 !important; }
+  `;
+  localStorage.setItem(SETTINGS_KEY,JSON.stringify({font,size,bold}));
+}
+
+function resetFontSettings(){
+  document.getElementById('fontStyleSelect').value='Arial,sans-serif';
+  document.getElementById('fontSizeRange').value=12;
+  document.getElementById('boldToggle').checked=false;
+  applyFontSettings();
+}
+
+function loadSettings(){
+  const s=localStorage.getItem(SETTINGS_KEY);
+  if(!s){
+    document.getElementById('fontStyleSelect').value='Arial,sans-serif';
+    document.getElementById('fontSizeRange').value=12;
+    applyFontSettings();
+    return;
+  }
+  try{
+    const {font,size,bold}=JSON.parse(s);
+    document.getElementById('fontStyleSelect').value=font||'Arial,sans-serif';
+    document.getElementById('fontSizeRange').value=size||12;
+    document.getElementById('boldToggle').checked=bold||false;
+    document.getElementById('fontSizeLabel').innerText=(size||12)+'px';
+    applyFontSettings();
+  }catch(e){}
+}
+
+/* ══ SIG CONTACTS (Prepared by / Noted by) ══ */
+function loadSigContacts(){
+  const raw=localStorage.getItem(SIG_CONTACTS_KEY);
+  return raw?JSON.parse(raw):{prepared:[],noted:[]};
+}
+function saveSigContactsStore(contacts){
+  localStorage.setItem(SIG_CONTACTS_KEY,JSON.stringify(contacts));
+}
+
+function renderSigList(role){
+  const contacts=loadSigContacts();
+  const list=contacts[role]||[];
+  const containerId=role==='prepared'?'prepList':'notedList';
+  const el=document.getElementById(containerId);
+  if(!el)return;
+  if(!list.length){el.innerHTML='<div style="font-size:.72rem;color:var(--gray);font-style:italic;padding:4px 0;">No saved names yet.</div>';return;}
+  el.innerHTML=list.map((c,i)=>`
+    <div style="display:flex;align-items:center;gap:6px;padding:5px 8px;background:#f9fafb;border-radius:6px;margin-bottom:4px;border:1px solid var(--border);">
+      <div style="flex:1;">
+        <div style="font-size:.8rem;font-weight:600;color:var(--dark);">${c.name}</div>
+        <div style="font-size:.7rem;color:var(--gray);">${c.pos||'—'}</div>
+      </div>
+      ${i===0?'<span style="font-size:.6rem;background:#dcfce7;color:#166534;border-radius:4px;padding:1px 5px;font-weight:700;">DEFAULT</span>':''}
+      <button onclick="moveSigUp('${role}',${i})" style="background:none;border:none;cursor:pointer;color:var(--gray);font-size:.8rem;padding:2px;" title="Move up">↑</button>
+      <button onclick="deleteSigContact('${role}',${i})" style="background:#fee2e2;color:#991b1b;border:none;border-radius:4px;cursor:pointer;font-size:.7rem;padding:2px 6px;">✕</button>
+    </div>`).join('');
+}
+
+function addSigContact(role){
+  const nameId=role==='prepared'?'settingsPrepName':'settingsNotedName';
+  const posId=role==='prepared'?'settingsPrepPos':'settingsNotedPos';
+  const name=document.getElementById(nameId).value.trim();
+  const pos=document.getElementById(posId).value.trim();
+  if(!name){alert('Please enter a name.');return;}
+  const contacts=loadSigContacts();
+  if(!contacts[role])contacts[role]=[];
+  const exists=contacts[role].find(c=>c.name===name);
+  if(exists){exists.pos=pos;}
+  else{contacts[role].push({name,pos});}
+  saveSigContactsStore(contacts);
+  document.getElementById(nameId).value='';
+  document.getElementById(posId).value='';
+  renderSigList(role);
+  applyDefaultSigToAllTabs();
+  const msg=document.getElementById('sigSaveMsg');
+  msg.style.display='block';msg.innerText='✓ Saved!';
+  setTimeout(()=>{msg.style.display='none';},2000);
+}
+
+function deleteSigContact(role,idx){
+  const contacts=loadSigContacts();
+  contacts[role].splice(idx,1);
+  saveSigContactsStore(contacts);
+  renderSigList(role);
+  applyDefaultSigToAllTabs();
+}
+
+function moveSigUp(role,idx){
+  if(idx===0)return;
+  const contacts=loadSigContacts();
+  const arr=contacts[role];
+  [arr[idx-1],arr[idx]]=[arr[idx],arr[idx-1]];
+  saveSigContactsStore(contacts);
+  renderSigList(role);
+  applyDefaultSigToAllTabs();
+}
+
+function applyDefaultSigToAllTabs(){
+  const contacts=loadSigContacts();
+  const prep=contacts.prepared?.[0];
+  const noted=contacts.noted?.[0];
+  // Apply to current UI
+  if(prep){
+    document.getElementById('sigName0').value=prep.name;
+    document.getElementById('sigPos0').value=prep.pos||'';
+  }
+  if(noted){
+    document.getElementById('sigName1').value=noted.name;
+    document.getElementById('sigPos1').value=noted.pos||'';
+  }
+  // Apply to all saved tabs
+  tabs.forEach(tab=>{
+    if(!tab.data)tab.data={};
+    if(prep){tab.data.sigName0=prep.name;tab.data.sigPos0=prep.pos||'';}
+    if(noted){tab.data.sigName1=noted.name;tab.data.sigPos1=noted.pos||'';}
+  });
+  saveAll();
+}
+
+function loadSettingsSigPanel(){
+  renderSigList('prepared');
+  renderSigList('noted');
+}
+
+function filterSigDropdown(idx){
+  const input=document.getElementById('sigName'+idx);
+  const drop=document.getElementById('sigDrop'+idx);
+  const role=idx===0?'prepared':'noted';
+  const val=input.value.toLowerCase();
+  const contacts=loadSigContacts();
+  const list=(contacts[role]||[]).filter(c=>c.name.toLowerCase().includes(val));
+  if(!list.length||!val){drop.classList.remove('open');return;}
+  drop.innerHTML=list.map(c=>`
+    <div class="sig-drop-item" onclick="selectSig(${idx},'${c.name.replace(/'/g,"\\'")}','${(c.pos||'').replace(/'/g,"\\'")}')">
+      <div class="sig-drop-name">${c.name}</div>
+      ${c.pos?`<div class="sig-drop-pos">${c.pos}</div>`:''}
+    </div>`).join('');
+  drop.classList.add('open');
+}
+
+function selectSig(idx,name,pos){
+  document.getElementById('sigName'+idx).value=name;
+  document.getElementById('sigPos'+idx).value=pos;
+  document.getElementById('sigDrop'+idx).classList.remove('open');
+  markUnsaved();
+}
+
+// Close dropdowns on outside click
+document.addEventListener('click',function(e){
+  [0,1].forEach(i=>{
+    const drop=document.getElementById('sigDrop'+i);
+    const input=document.getElementById('sigName'+i);
+    if(drop&&!drop.contains(e.target)&&e.target!==input)
+      drop.classList.remove('open');
+  });
+});
+
 /* ══ PWA INSTALL ══ */
 let deferredInstallPrompt = null;
 
@@ -518,8 +840,10 @@ function installApp(){
 
 /* ══ HELP ══ */
 function toggleHelp(){
-  const panel=document.getElementById('helpPanel');
-  panel.classList.toggle('open');
+  const p=document.getElementById('helpPanel');
+  p.classList.toggle('open');
+  if(document.getElementById('settingsPanel').classList.contains('open'))
+    document.getElementById('settingsPanel').classList.remove('open');
 }
 function showHelpTab(idx){
   document.querySelectorAll('.help-tab').forEach((t,i)=>t.classList.toggle('active',i===idx));
@@ -582,6 +906,8 @@ function collectCurrentData(){
     sigName1:document.getElementById('sigName1').value,
     sigName2:document.getElementById('sigName2').value,
     sigName3:document.getElementById('sigName3').value,
+    sigPos0:document.getElementById('sigPos0').value,
+    sigPos1:document.getElementById('sigPos1').value,
     rows,
     goodsRows:collectBreakdown('goodsBody'),
     goodsVisible:document.getElementById('goodsSection').style.display!=='none',
@@ -609,6 +935,10 @@ function loadDataIntoUI(data){
   document.getElementById('sigName1').value=data.sigName1||'';
   document.getElementById('sigName2').value=data.sigName2||'';
   document.getElementById('sigName3').value=data.sigName3||'RAM MIRCH';
+  document.getElementById('sigPos0').value=data.sigPos0||'';
+  document.getElementById('sigPos1').value=data.sigPos1||'';
+  autoResize(document.getElementById('sigPos0'));
+  autoResize(document.getElementById('sigPos1'));
   document.querySelectorAll('.doc-field textarea').forEach(t=>autoResize(t));
   ewtEnabled=data.ewtEnabled||false;
   document.getElementById('ewtOffState').style.display=ewtEnabled?'none':'flex';
@@ -678,7 +1008,15 @@ function renderTabs(){
 function addTab(){
   if(activeTabId){const cur=tabs.find(t=>t.id===activeTabId);if(cur)cur.data=collectCurrentData();}
   const id=uid();const num=tabs.length+1;
-  tabs.push({id,name:`Quote ${num}`,data:{sigName3:'RAM MIRCH',rows:[{}]}});
+  const contacts=loadSigContacts();
+  const prep=contacts.prepared?.[0];
+  const noted=contacts.noted?.[0];
+  tabs.push({id,name:`Quote ${num}`,data:{
+    sigName3:'RAM MIRCH',
+    sigName0:prep?.name||'',sigPos0:prep?.pos||'',
+    sigName1:noted?.name||'',sigPos1:noted?.pos||'',
+    rows:[{}]
+  }});
   activeTabId=id;renderTabs();
   loadDataIntoUI(tabs.find(t=>t.id===id).data);
   addRow();saveAll();
@@ -1131,6 +1469,7 @@ function exportImage(){
 }
 
 window.onload=function(){
+  loadSettings();
   const today=getTodayDate();
   const saved=localStorage.getItem(STORAGE_KEY);
   if(saved){
