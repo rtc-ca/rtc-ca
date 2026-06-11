@@ -315,57 +315,16 @@ table.cost-table{width:100%;border-collapse:collapse;font-size:.78rem;}
       </div>
 
       <!-- GOODS BREAKDOWN -->
-      <div id="goodsSection" style="display:none;">
-        <div class="breakdown-card">
-          <div class="d-flex justify-content-between align-items-center mb-1">
-            <div class="section-label mb-0">Goods Breakdown</div>
-            <div class="d-flex gap-2 no-print">
-              <button class="btn-outline-maroon" onclick="addBreakdownRow('goodsBody','goods')">+ Add Row</button>
-              <button class="btn-danger-sm" onclick="hideSection('goodsSection','addGoodsBtn')">✕ Remove</button>
-            </div>
-          </div>
-          <div class="table-responsive">
-            <table class="breakdown-table">
-              <thead><tr><th style="width:42%">Item</th><th>Qty</th><th>Unit Cost</th><th>Total</th><th class="no-print"></th></tr></thead>
-              <tbody id="goodsBody"></tbody>
-              <tfoot>
-                <tr class="breakdown-ewt-row"><td colspan="2">NON-VAT EWT 1% (Assumed by RTC)</td><td></td><td><input type="text" id="goodsEwt1" style="border:none;border-bottom:1px solid #fca5a5;width:100%;font-size:.72rem;background:transparent;padding:2px 4px;color:#c0392b;font-style:italic;" placeholder="—"></td><td class="no-print"></td></tr>
-                <tr class="breakdown-ewt-row"><td colspan="2">VATABLE EWT 1% (Assumed by RTC)</td><td></td><td><input type="text" id="goodsEwtV1" style="border:none;border-bottom:1px solid #fca5a5;width:100%;font-size:.72rem;background:transparent;padding:2px 4px;color:#c0392b;font-style:italic;" placeholder="—"></td><td class="no-print"></td></tr>
-                <tr class="breakdown-total-row"><td colspan="2">TOTAL COST</td><td id="goodsTotalQty"></td><td id="goodsTotalCost"></td><td class="no-print"></td></tr>
-              </tfoot>
-            </table>
-          </div>
-        </div>
-      </div>
+      <!-- GOODS BREAKDOWN — dynamic multiple sections -->
+      <div id="goodsContainer"></div>
       <div id="addGoodsBtn" class="mt-2 no-print">
-        <button class="btn-outline-maroon" onclick="showSection('goodsSection','addGoodsBtn','goodsBody','goods')" style="width:100%;padding:8px;border-style:dashed;font-size:.78rem;">+ Add Goods Breakdown</button>
+        <button class="btn-outline-maroon" onclick="addBreakdownSection('goods')" style="width:100%;padding:8px;border-style:dashed;font-size:.78rem;">+ Add Goods Breakdown</button>
       </div>
 
-      <!-- PDM/CUSTOMIZED BREAKDOWN -->
-      <div id="pdmSection" style="display:none;">
-        <div class="breakdown-card">
-          <div class="d-flex justify-content-between align-items-center mb-1">
-            <div class="section-label mb-0">PDM / Customized Breakdown</div>
-            <div class="d-flex gap-2 no-print">
-              <button class="btn-outline-maroon" onclick="addBreakdownRow('pdmBody','pdm')">+ Add Row</button>
-              <button class="btn-danger-sm" onclick="hideSection('pdmSection','addPdmBtn')">✕ Remove</button>
-            </div>
-          </div>
-          <div class="table-responsive">
-            <table class="breakdown-table">
-              <thead><tr><th style="width:42%">Item</th><th>Qty</th><th>Unit Cost</th><th>Total</th><th class="no-print"></th></tr></thead>
-              <tbody id="pdmBody"></tbody>
-              <tfoot>
-                <tr class="breakdown-ewt-row"><td colspan="2">NON-VAT EWT 2% (Assumed by RTC)</td><td></td><td><input type="text" id="pdmEwt1" style="border:none;border-bottom:1px solid #fca5a5;width:100%;font-size:.72rem;background:transparent;padding:2px 4px;color:#c0392b;font-style:italic;" placeholder="—"></td><td class="no-print"></td></tr>
-                <tr class="breakdown-ewt-row"><td colspan="2">VATABLE EWT 2% (Assumed by RTC)</td><td></td><td><input type="text" id="pdmEwtV1" style="border:none;border-bottom:1px solid #fca5a5;width:100%;font-size:.72rem;background:transparent;padding:2px 4px;color:#c0392b;font-style:italic;" placeholder="—"></td><td class="no-print"></td></tr>
-                <tr class="breakdown-total-row"><td colspan="2">TOTAL COST</td><td id="pdmTotalQty"></td><td id="pdmTotalCost"></td><td class="no-print"></td></tr>
-              </tfoot>
-            </table>
-          </div>
-        </div>
-      </div>
+      <!-- PDM/CUSTOMIZED BREAKDOWN — dynamic multiple sections -->
+      <div id="pdmContainer"></div>
       <div id="addPdmBtn" class="mt-2 no-print">
-        <button class="btn-outline-maroon" onclick="showSection('pdmSection','addPdmBtn','pdmBody','pdm')" style="width:100%;padding:8px;border-style:dashed;font-size:.78rem;">+ Add PDM / Customized Breakdown</button>
+        <button class="btn-outline-maroon" onclick="addBreakdownSection('pdm')" style="width:100%;padding:8px;border-style:dashed;font-size:.78rem;">+ Add PDM / Customized Breakdown</button>
       </div>
 
     </div>
@@ -893,16 +852,29 @@ function collectCurrentData(){
       markupPct:tr.querySelector('.markup-pct-input')?.value||'40',
     });
   });
-  const collectBreakdown=(bodyId)=>{
-    const arr=[];
-    document.querySelectorAll('#'+bodyId+' tr').forEach(tr=>{
-      arr.push({
-        item:tr.querySelector('.bd-item')?.value||tr.querySelector('input[type="text"]:not(.bd-total):not(.readonly)')?.value||'',
-        qty:tr.querySelector('.bd-qty')?.value||'',
-        unit:tr.querySelector('.bd-unit')?.value||'',
+  const collectBreakdownSections=(type)=>{
+    const container=document.getElementById(type==='goods'?'goodsContainer':'pdmContainer');
+    if(!container)return[];
+    const sections=[];
+    container.querySelectorAll('tbody[id]').forEach(tbody=>{
+      const rows=[];
+      tbody.querySelectorAll('tr').forEach(tr=>{
+        rows.push({
+          item:tr.querySelector('.bd-item')?.value||'',
+          qty:tr.querySelector('.bd-qty')?.value||'',
+          unit:tr.querySelector('.bd-unit')?.value||'',
+        });
+      });
+      // get EWT values
+      const card=tbody.closest('.breakdown-card');
+      const ewtInputs=card?card.querySelectorAll('.breakdown-ewt-row input[type="text"]'):[];
+      sections.push({
+        rows,
+        ewt1:ewtInputs[0]?.value||'',
+        ewtV1:ewtInputs[1]?.value||'',
       });
     });
-    return arr;
+    return sections;
   };
   return{
     client:document.getElementById('docClient').value,
@@ -919,10 +891,8 @@ function collectCurrentData(){
     sigPos0:document.getElementById('sigPos0').value,
     sigPos1:document.getElementById('sigPos1').value,
     rows,
-    goodsRows:collectBreakdown('goodsBody'),
-    goodsVisible:document.getElementById('goodsSection').style.display!=='none',
-    pdmRows:collectBreakdown('pdmBody'),
-    pdmVisible:document.getElementById('pdmSection').style.display!=='none',
+    goodsSections:collectBreakdownSections('goods'),
+    pdmSections:collectBreakdownSections('pdm'),
   };
 }
 
@@ -972,29 +942,53 @@ function loadDataIntoUI(data){
     if(r.imgSrc){const b=tr.querySelector('.img-upload-btn');b.querySelector('img').src=r.imgSrc;b.classList.add('has-img');}
   });
 
-  const loadBreakdown=(rows,bodyId,type,sectionId,btnId)=>{
-    document.getElementById(bodyId).innerHTML='';
-    if(data[rows+'Visible']||data[rows]?.length){
-      if(data[rows+'Visible']){
-        document.getElementById(sectionId).style.display='block';
-        document.getElementById(btnId).style.display='none';
-      }
-      (data[rows]||[]).forEach(r=>{
-        addBreakdownRow(bodyId,type);
-        const tr=document.getElementById(bodyId).lastElementChild;
-        const itemField=tr.querySelector('.bd-item')||tr.querySelector('input[type="text"]:not(.bd-total):not(.readonly)');
-        if(itemField){itemField.value=r.item||'';if(itemField.tagName==='TEXTAREA')autoResize(itemField);}
-        tr.querySelector('.bd-qty').value=r.qty||'';
-        tr.querySelector('.bd-unit').value=r.unit||'';
-      });
-      calcBreakdown(type);
-    }else{
-      document.getElementById(sectionId).style.display='none';
-      document.getElementById(btnId).style.display='block';
-    }
-  };
-  loadBreakdown('goodsRows','goodsBody','goods','goodsSection','addGoodsBtn');
-  loadBreakdown('pdmRows','pdmBody','pdm','pdmSection','addPdmBtn');
+  // Reset counters and containers
+  goodsSectionCount=0; pdmSectionCount=0;
+  document.getElementById('goodsContainer').innerHTML='';
+  document.getElementById('pdmContainer').innerHTML='';
+
+  (data.goodsSections||[]).forEach(sec=>{
+    addBreakdownSection('goods');
+    const bodyId=`goodsBody_${goodsSectionCount}`;
+    const tbody=document.getElementById(bodyId);
+    if(!tbody)return;
+    tbody.innerHTML='';
+    (sec.rows||[]).forEach(r=>{
+      addBreakdownRow(bodyId,'goods');
+      const tr=tbody.lastElementChild;
+      const itemField=tr.querySelector('.bd-item');
+      if(itemField){itemField.value=r.item||'';autoResize(itemField);}
+      tr.querySelector('.bd-qty').value=r.qty||'';
+      tr.querySelector('.bd-unit').value=r.unit||'';
+    });
+    const card=tbody.closest('.breakdown-card');
+    const ewtInputs=card?card.querySelectorAll('.breakdown-ewt-row input[type="text"]'):[];
+    if(ewtInputs[0])ewtInputs[0].value=sec.ewt1||'';
+    if(ewtInputs[1])ewtInputs[1].value=sec.ewtV1||'';
+    calcBreakdown('goods');
+  });
+
+  (data.pdmSections||[]).forEach(sec=>{
+    addBreakdownSection('pdm');
+    const bodyId=`pdmBody_${pdmSectionCount}`;
+    const tbody=document.getElementById(bodyId);
+    if(!tbody)return;
+    tbody.innerHTML='';
+    (sec.rows||[]).forEach(r=>{
+      addBreakdownRow(bodyId,'pdm');
+      const tr=tbody.lastElementChild;
+      const itemField=tr.querySelector('.bd-item');
+      if(itemField){itemField.value=r.item||'';autoResize(itemField);}
+      tr.querySelector('.bd-qty').value=r.qty||'';
+      tr.querySelector('.bd-unit').value=r.unit||'';
+    });
+    const card=tbody.closest('.breakdown-card');
+    const ewtInputs=card?card.querySelectorAll('.breakdown-ewt-row input[type="text"]'):[];
+    if(ewtInputs[0])ewtInputs[0].value=sec.ewt1||'';
+    if(ewtInputs[1])ewtInputs[1].value=sec.ewtV1||'';
+    calcBreakdown('pdm');
+  });
+
   calculate();
 }
 
@@ -1037,8 +1031,9 @@ function switchTab(id){
   activeTabId=id;renderTabs();
   const tab=tabs.find(t=>t.id===id);
   document.getElementById('tableBody').innerHTML='';
-  document.getElementById('goodsBody').innerHTML='';
-  document.getElementById('pdmBody').innerHTML='';
+  goodsSectionCount=0;pdmSectionCount=0;
+  document.getElementById('goodsContainer').innerHTML='';
+  document.getElementById('pdmContainer').innerHTML='';
   loadDataIntoUI(tab.data);
 }
 function closeTab(id,e){
@@ -1050,8 +1045,9 @@ function closeTab(id,e){
     activeTabId=tabs[Math.max(0,idx-1)].id;
     const tab=tabs.find(t=>t.id===activeTabId);
     document.getElementById('tableBody').innerHTML='';
-    document.getElementById('goodsBody').innerHTML='';
-    document.getElementById('pdmBody').innerHTML='';
+    goodsSectionCount=0;pdmSectionCount=0;
+    document.getElementById('goodsContainer').innerHTML='';
+    document.getElementById('pdmContainer').innerHTML='';
     loadDataIntoUI(tab.data);
   }
   renderTabs();saveAll();
@@ -1253,12 +1249,9 @@ function createRows(){
 function deleteAllRows(){
   if(!confirm('Delete all rows?'))return;
   document.getElementById('tableBody').innerHTML='';
-  document.getElementById('goodsSection').style.display='none';
-  document.getElementById('addGoodsBtn').style.display='block';
-  document.getElementById('goodsBody').innerHTML='';
-  document.getElementById('pdmSection').style.display='none';
-  document.getElementById('addPdmBtn').style.display='block';
-  document.getElementById('pdmBody').innerHTML='';
+  goodsSectionCount=0; pdmSectionCount=0;
+  document.getElementById('goodsContainer').innerHTML='';
+  document.getElementById('pdmContainer').innerHTML='';
   calculate();markUnsaved();
 }
 function clearAllFields(){
@@ -1272,19 +1265,77 @@ function clearAllFields(){
   markUnsaved();
 }
 
-/* BREAKDOWN (shared for goods + pdm) */
-function showSection(sectionId,btnId,bodyId,type){
-  document.getElementById(sectionId).style.display='block';
-  document.getElementById(btnId).style.display='none';
-  if(!document.getElementById(bodyId).children.length){
-    addBreakdownRow(bodyId,type);addBreakdownRow(bodyId,type);addBreakdownRow(bodyId,type);
-  }
+/* ══ BREAKDOWN SECTIONS (multi) ══ */
+let goodsSectionCount=0;
+let pdmSectionCount=0;
+
+function addBreakdownSection(type){
+  const container=document.getElementById(type==='goods'?'goodsContainer':'pdmContainer');
+  const count=type==='goods'?++goodsSectionCount:++pdmSectionCount;
+  const sectionId=`${type}Section_${count}`;
+  const bodyId=`${type}Body_${count}`;
+  const label=type==='goods'?'Goods Breakdown':'PDM / Customized Breakdown';
+  const ewtPct=type==='goods'?'1%':'2%';
+  const title=count>1?`${label} ${count}`:label;
+  const div=document.createElement('div');
+  div.id=sectionId;
+  div.className='mt-2';
+  div.innerHTML=`
+    <div class="breakdown-card">
+      <div class="d-flex justify-content-between align-items-center mb-1">
+        <div class="section-label mb-0">${title}</div>
+        <div class="d-flex gap-2 no-print">
+          <button class="btn-outline-maroon" onclick="addBreakdownRow('${bodyId}','${type}')">+ Add Row</button>
+          <button class="btn-danger-sm" onclick="document.getElementById('${sectionId}').remove();markUnsaved();">✕ Remove</button>
+        </div>
+      </div>
+      <div class="table-responsive">
+        <table class="breakdown-table">
+          <thead><tr><th style="width:42%">Item</th><th>Qty</th><th>Unit Cost</th><th>Total</th><th class="no-print"></th></tr></thead>
+          <tbody id="${bodyId}"></tbody>
+          <tfoot>
+            <tr class="breakdown-ewt-row"><td colspan="2">NON-VAT EWT ${ewtPct} (Assumed by RTC)</td><td></td>
+              <td><input type="text" style="border:none;border-bottom:1px solid #fca5a5;width:100%;font-size:.72rem;background:transparent;padding:2px 4px;color:#c0392b;font-style:italic;" placeholder="—"></td>
+              <td class="no-print"></td></tr>
+            <tr class="breakdown-ewt-row"><td colspan="2">VATABLE EWT ${ewtPct} (Assumed by RTC)</td><td></td>
+              <td><input type="text" style="border:none;border-bottom:1px solid #fca5a5;width:100%;font-size:.72rem;background:transparent;padding:2px 4px;color:#c0392b;font-style:italic;" placeholder="—"></td>
+              <td class="no-print"></td></tr>
+            <tr class="breakdown-total-row"><td colspan="2">TOTAL COST</td>
+              <td id="${type}TotalQty_${count}"></td>
+              <td id="${type}TotalCost_${count}"></td>
+              <td class="no-print"></td></tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>`;
+  container.appendChild(div);
+  addBreakdownRow(bodyId,type);
+  addBreakdownRow(bodyId,type);
+  addBreakdownRow(bodyId,type);
   markUnsaved();
 }
-function hideSection(sectionId,btnId){
-  document.getElementById(sectionId).style.display='none';
-  document.getElementById(btnId).style.display='block';
-  markUnsaved();
+
+function calcBreakdown(type){
+  // calc all sections of this type
+  const container=document.getElementById(type==='goods'?'goodsContainer':'pdmContainer');
+  if(!container)return;
+  container.querySelectorAll('tbody[id]').forEach(tbody=>{
+    const bodyId=tbody.id;
+    const match=bodyId.match(/(\d+)$/);
+    const count=match?match[1]:'';
+    let tQty=0,tCost=0;
+    tbody.querySelectorAll('tr').forEach(row=>{
+      const q=parseFloat(row.querySelector('.bd-qty')?.value)||0;
+      const u=parseFloat(row.querySelector('.bd-unit')?.value)||0;
+      const t=q*u;
+      if(row.querySelector('.bd-total'))row.querySelector('.bd-total').value=t?peso(t):'';
+      tQty+=q;tCost+=t;
+    });
+    const tQtyEl=document.getElementById(`${type}TotalQty_${count}`);
+    const tCostEl=document.getElementById(`${type}TotalCost_${count}`);
+    if(tQtyEl)tQtyEl.innerText=tQty||'';
+    if(tCostEl)tCostEl.innerText=tCost?'₱'+peso(tCost):'';
+  });
 }
 
 function addBreakdownRow(bodyId,type){
@@ -1340,22 +1391,6 @@ document.addEventListener('DOMContentLoaded',()=>{
   document.head.appendChild(s);
 });
 
-
-function calcBreakdown(type){
-  const bodyId=type==='goods'?'goodsBody':'pdmBody';
-  const prefix=type==='goods'?'goods':'pdm';
-  let tQty=0,tCost=0;
-  document.querySelectorAll('#'+bodyId+' tr').forEach(row=>{
-    const q=parseFloat(row.querySelector('.bd-qty')?.value)||0;
-    const u=parseFloat(row.querySelector('.bd-unit')?.value)||0;
-    const t=q*u;
-    if(row.querySelector('.bd-total'))row.querySelector('.bd-total').value=t?peso(t):'';
-    tQty+=q;tCost+=t;
-  });
-  document.getElementById(prefix+'TotalQty').innerText=tQty||'';
-  document.getElementById(prefix+'TotalCost').innerText=tCost?'₱'+peso(tCost):'';
-  // EWT fields are manual — user fills them
-}
 
 function calculate(){
   let tQty=0,tSelling=0,tCost=0,tProfit=0;
