@@ -63,10 +63,10 @@ table.cost-table{width:100%;border-collapse:collapse;font-size:.78rem;}
 .markup-pct-input{border:none;border-bottom:1px solid var(--border);width:36px;font-size:.7rem;text-align:center;background:transparent;outline:none;padding:1px 2px;color:var(--maroon);font-weight:600;}
 .markup-pct-input:focus{border-bottom-color:var(--maroon);}
 
-.img-cell{text-align:center;width:82px;min-width:82px;}
-.img-upload-btn{width:72px;height:72px;border:2px dashed #d1d5db;border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.58rem;color:#9ca3af;overflow:hidden;background:#fafafa;margin:0 auto;position:relative;flex-shrink:0;transition:border-color .2s;}
+.img-cell{text-align:center;width:98px;min-width:98px;}
+.img-upload-btn{width:86px;height:86px;border:2px dashed #d1d5db;border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.58rem;color:#9ca3af;overflow:hidden;background:#fafafa;margin:0 auto;position:relative;flex-shrink:0;transition:border-color .2s;}
 .img-upload-btn:hover{border-color:var(--maroon);background:var(--maroon-pale);color:var(--maroon);}
-.img-upload-btn img{width:100%;height:100%;object-fit:cover;border-radius:4px;position:absolute;inset:0;display:none;}
+.img-upload-btn img{width:100%;height:100%;object-fit:contain;border-radius:4px;position:absolute;inset:0;display:none;background:#fff;}
 .img-upload-btn.has-img img{display:block;}
 .img-upload-btn.has-img .upload-label{display:none;}
 .img-upload-btn input[type="file"]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;z-index:2;}
@@ -542,6 +542,17 @@ table.cost-table{width:100%;border-collapse:collapse;font-size:.78rem;}
         <li><strong>9. Multiple Quotes</strong> — Use tabs at the top. Click <em>＋ New Quote</em> to add. Double-click tab name to rename.</li>
         <li><strong>10. Auto-Save</strong> — Data saves automatically every 2 seconds to your browser.</li>
       </ul>
+
+      <h4 style="margin-top:14px;margin-bottom:8px;">Image per Row</h4>
+      <ul>
+        <li><strong>Click the image cell</strong> — focuses it (enables Ctrl+V paste)</li>
+        <li><strong>Insert button</strong> — opens file picker to upload from your device</li>
+        <li><strong>Ctrl+V</strong> — focus the cell first, then paste a copied image</li>
+        <li><strong>Right-click</strong> — shows menu: Paste Image, Upload Image, Remove Image</li>
+        <li><strong>Backspace / Delete key</strong> — focus the cell then press to remove image</li>
+        <li><strong>Replace</strong> — just Insert or paste a new image over the existing one</li>
+        <li>Images auto-fit the cell — portrait, landscape, or square — no distortion</li>
+      </ul>
     </div>
 
     <!-- FIELD GUIDE -->
@@ -590,14 +601,6 @@ table.cost-table{width:100%;border-collapse:collapse;font-size:.78rem;}
         <span class="kbd">Shift + Enter</span> — new line in Item/Supplier field<br>
         <span class="kbd">Tab</span> — move to next cell
       </p>
-      <p><strong>How do I add an image to a row?</strong></p>
-      <ul>
-        <li><strong>Click the image cell</strong> — focuses the cell (enables Ctrl+V paste)</li>
-        <li><strong>Insert button</strong> — click the red Insert button inside the cell to open file picker and upload from your device</li>
-        <li><strong>Ctrl+V</strong> — click the image cell first to focus it, then press Ctrl+V to paste a copied image</li>
-        <li><strong>Right-click the image cell</strong> — shows a menu with Paste Image, Upload Image, and Remove Image options</li>
-        <li><strong>Backspace or Delete</strong> — click the image cell then press Backspace or Delete to remove the image</li>
-      </ul>
       <p><strong>Need help or suggestions?</strong><br>Contact <strong>Executive Assistant Department</strong> or <strong>Isaac</strong>.</p>
       <p><strong>How do I install this as an app?</strong></p>
       <p><strong>Option 1:</strong> Click the <strong>📲 Install App</strong> button in the header (if visible). Click Install when prompted. Once installed, you can open it like a regular app on your phone or desktop. The button disappears after installation.</p>
