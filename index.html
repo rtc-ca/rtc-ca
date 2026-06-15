@@ -134,7 +134,7 @@ table.cost-table{width:100%;border-collapse:collapse;font-size:.78rem;}
   @page{size:letter landscape;margin:1.2cm 1.4cm;}
   *{-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important;}
   body{background:#fff !important;font-size:8.5pt;}
-  .no-print,.app-header,.toolbar,#addGoodsBtn,#addPdmBtn,.tabs-bar{display:none !important;}
+  .no-print,.app-header,.toolbar,#addGoodsBtn,#addPdmBtn,#addNotesBtn,.tabs-bar{display:none !important;}
   .container-fluid{padding:0 !important;}
   .row{display:block !important;}
   .col-lg-9,.col-lg-3{width:100% !important;max-width:100% !important;flex:none !important;padding:0 !important;}
@@ -174,6 +174,8 @@ table.cost-table{width:100%;border-collapse:collapse;font-size:.78rem;}
   .img-upload-btn input[type="file"]{display:none !important;}
   .upload-label{display:none !important;}
   .breakdown-card{margin-top:6pt !important;padding:4pt 6pt !important;border:1px solid #ccc !important;page-break-inside:avoid;break-inside:avoid;}
+  #notesSection .breakdown-card{page-break-inside:avoid;break-inside:avoid;}
+  #notesText{border:none !important;background:transparent !important;font-size:7.5pt !important;padding:0 !important;resize:none !important;overflow:visible !important;height:auto !important;width:100% !important;}
   .breakdown-table{font-size:7pt !important;}
   .breakdown-table input{border:none !important;background:transparent !important;font-size:7pt !important;}
   .breakdown-table textarea.bd-item{border:none !important;background:transparent !important;padding:0 !important;font-size:7pt !important;resize:none !important;overflow:visible !important;height:auto !important;}
@@ -325,6 +327,22 @@ table.cost-table{width:100%;border-collapse:collapse;font-size:.78rem;}
       <div id="pdmContainer"></div>
       <div id="addPdmBtn" class="mt-2 no-print">
         <button class="btn-outline-maroon" onclick="addBreakdownSection('pdm')" style="width:100%;padding:8px;border-style:dashed;font-size:.78rem;">+ Add PDM / Customized Breakdown</button>
+      </div>
+
+      <!-- NOTES SECTION -->
+      <div id="notesSection" style="display:none;" class="mt-2">
+        <div class="breakdown-card">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <div class="section-label mb-0">Notes</div>
+            <button class="btn-danger-sm no-print" onclick="hideNotes()">✕ Remove</button>
+          </div>
+          <textarea id="notesText" placeholder="Write your notes here..."
+            oninput="autoResize(this);markUnsaved()"
+            style="width:100%;border:1px solid var(--border);border-radius:6px;padding:10px 12px;font-size:.82rem;font-family:inherit;resize:none;outline:none;overflow:hidden;min-height:80px;line-height:1.6;color:var(--dark);background:#fafafa;"></textarea>
+        </div>
+      </div>
+      <div id="addNotesBtn" class="mt-2 no-print">
+        <button class="btn-outline-maroon" onclick="showNotes()" style="width:100%;padding:8px;border-style:dashed;font-size:.78rem;">+ Add Notes</button>
       </div>
 
     </div>
@@ -506,8 +524,8 @@ table.cost-table{width:100%;border-collapse:collapse;font-size:.78rem;}
       <ul>
         <li><strong>Click the image cell</strong> — focuses it (enables Ctrl+V paste)</li>
         <li><strong>Insert button</strong> — opens file picker to upload from your device</li>
-        <li><strong>Ctrl+V</strong> — focus the cell first, then paste a copied image</li>
-        <li><strong>Right-click</strong> — shows menu: Paste Image, Upload Image, Remove Image</li>
+        <li><strong>Ctrl+V</strong> — the only way to paste an image. Copy an image first, click the image cell to focus it, then press Ctrl+V. Right-click paste is not supported by browsers.</li>
+        <li><strong>Right-click</strong> — shows menu: Upload Image, Remove Image</li>
         <li><strong>Backspace / Delete key</strong> — focus the cell then press to remove image</li>
         <li><strong>Replace</strong> — just Insert or paste a new image over the existing one</li>
         <li>Images auto-fit the cell — portrait, landscape, or square — no distortion</li>
@@ -893,6 +911,8 @@ function collectCurrentData(){
     rows,
     goodsSections:collectBreakdownSections('goods'),
     pdmSections:collectBreakdownSections('pdm'),
+    notesText:document.getElementById('notesText').value,
+    notesVisible:document.getElementById('notesSection').style.display!=='none',
   };
 }
 
@@ -988,6 +1008,21 @@ function loadDataIntoUI(data){
     if(ewtInputs[1])ewtInputs[1].value=sec.ewtV1||'';
     calcBreakdown('pdm');
   });
+
+  // Notes
+  const notesEl=document.getElementById('notesText');
+  const notesSec=document.getElementById('notesSection');
+  const notesBtn=document.getElementById('addNotesBtn');
+  if(data.notesVisible&&data.notesText){
+    notesEl.value=data.notesText;
+    notesSec.style.display='block';
+    notesBtn.style.display='none';
+    autoResize(notesEl);
+  } else {
+    notesEl.value='';
+    notesSec.style.display='none';
+    notesBtn.style.display='block';
+  }
 
   calculate();
 }
@@ -1097,7 +1132,7 @@ function addRow(){
         onclick="focusImgCell(event,this)"
         title="Click to focus for paste | Ctrl+V to paste | Backspace to remove">
         <span class="upload-label" style="font-size:.5rem;text-align:center;line-height:1.6;padding:2px;display:flex;flex-direction:column;align-items:center;gap:4px;">
-          <span style="color:#9ca3af;">📷 Click to Paste</span>
+          <span style="color:#9ca3af;">📷 Click (Ctrl+V to Paste)</span>
           <label style="background:var(--maroon);color:#fff;border-radius:4px;padding:2px 8px;font-size:.5rem;cursor:pointer;margin-top:1px;" onclick="event.stopPropagation()">
             Insert
             <input type="file" accept="image/*" onchange="loadItemImage(this)" style="display:none;">
@@ -1202,23 +1237,15 @@ function showImgContextMenu(e,btn){
     document.body.appendChild(menu);
   }
   menu.innerHTML=`
-    <div onclick="triggerPasteOnBtn(_ctxBtn);closeImgMenu()" style="padding:8px 14px;cursor:pointer;display:flex;align-items:center;gap:8px;" onmouseover="this.style.background='#fdf3f3'" onmouseout="this.style.background=''">
-      📋 <span>Paste Image</span>
-    </div>
-    <div onclick="_ctxBtn.querySelector('input[type=file]').click();closeImgMenu()" style="padding:8px 14px;cursor:pointer;display:flex;align-items:center;gap:8px;" onmouseover="this.style.background='#fdf3f3'" onmouseout="this.style.background=''">>
+    <div onclick="_ctxBtn.querySelector('input[type=file]').click();closeImgMenu()" style="padding:8px 14px;cursor:pointer;display:flex;align-items:center;gap:8px;" onmouseover="this.style.background='#fdf3f3'" onmouseout="this.style.background=''">
       📁 <span>Upload Image</span>
     </div>
     <div onclick="removeImg(_ctxBtn);closeImgMenu()" style="padding:8px 14px;cursor:pointer;display:flex;align-items:center;gap:8px;color:#991b1b;" onmouseover="this.style.background='#fee2e2'" onmouseout="this.style.background=''">
       🗑 <span>Remove Image</span>
     </div>`;
   menu.style.left=Math.min(e.clientX,window.innerWidth-160)+'px';
-  menu.style.top=Math.min(e.clientY,window.innerHeight-130)+'px';
+  menu.style.top=Math.min(e.clientY,window.innerHeight-100)+'px';
   menu.style.display='block';
-}
-
-function triggerPasteOnBtn(btn){
-  // Focus the btn then simulate paste via keyboard — browser will fire paste event
-  if(btn){btn.focus();document.execCommand('paste');}
 }
 
 function closeImgMenu(){
@@ -1252,6 +1279,9 @@ function deleteAllRows(){
   goodsSectionCount=0; pdmSectionCount=0;
   document.getElementById('goodsContainer').innerHTML='';
   document.getElementById('pdmContainer').innerHTML='';
+  document.getElementById('notesText').value='';
+  document.getElementById('notesSection').style.display='none';
+  document.getElementById('addNotesBtn').style.display='block';
   calculate();markUnsaved();
 }
 function clearAllFields(){
@@ -1262,6 +1292,20 @@ function clearAllFields(){
   document.getElementById('docRef').value='';
   document.getElementById('docQuotation').value='';
   document.querySelectorAll('.doc-field textarea').forEach(t=>autoResize(t));
+  markUnsaved();
+}
+
+/* ══ NOTES ══ */
+function showNotes(){
+  document.getElementById('notesSection').style.display='block';
+  document.getElementById('addNotesBtn').style.display='none';
+  setTimeout(()=>autoResize(document.getElementById('notesText')),50);
+  markUnsaved();
+}
+function hideNotes(){
+  document.getElementById('notesSection').style.display='none';
+  document.getElementById('addNotesBtn').style.display='block';
+  document.getElementById('notesText').value='';
   markUnsaved();
 }
 
