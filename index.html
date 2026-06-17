@@ -195,7 +195,8 @@ table.cost-table{width:100%;border-collapse:collapse;font-size:.78rem;border:var
   .cost-table thead tr th{padding:4pt 3pt !important;font-size:6.5pt !important;}
   .cost-table tbody td{padding:2pt 2pt !important;}
   .cost-table input[type="text"],.cost-table input[type="number"]{border:none !important;background:transparent !important;padding:0 !important;font-size:7pt !important;min-width:0 !important;}
-  .cost-table textarea.supplier-name{border:none !important;background:transparent !important;padding:0 !important;font-size:7pt !important;min-width:0 !important;resize:none !important;}
+  .cost-table textarea.supplier-name{display:none !important;}
+  .supplier-print{display:block !important;font-size:7pt !important;line-height:1.4 !important;word-break:break-word !important;white-space:pre-wrap !important;color:#000 !important;}
   .cost-table input.auto-green{font-weight:700 !important;color:#166534 !important;}
   .markup-value{font-size:7pt !important;font-weight:700 !important;color:#166534 !important;}
   .markup-pct-input{border:none !important;font-size:6pt !important;}
@@ -896,6 +897,7 @@ function loadDataIntoUI(data){
     const tr=document.getElementById('tableBody').lastElementChild;
     tr.querySelector('.supplier-name').value=r.supplier||'';
     autoResize(tr.querySelector('.supplier-name'));
+    updateSupplierPrint(tr.querySelector('.supplier-name'));
     tr.querySelector('.item').value=r.item||'';
     tr.querySelector('.printing').value=r.printing||'';
     const si=tr.querySelector('.selling');
@@ -1058,8 +1060,9 @@ function addRow(){
   tr.innerHTML=`
     <td style="vertical-align:top;padding-top:6px;">
       <textarea class="supplier-name" rows="1" placeholder=" "
-        oninput="autoResize(this);calculate();markUnsaved()"
+        oninput="autoResize(this);updateSupplierPrint(this);calculate();markUnsaved()"
         onkeydown="handleSupplierKey(event)"></textarea>
+      <div class="supplier-print" style="display:none;font-size:7pt;line-height:1.4;word-break:break-word;white-space:pre-wrap;color:#000;"></div>
     </td>
     <td class="img-cell">
       <div class="img-upload-btn" tabindex="0"
@@ -1099,6 +1102,11 @@ function addRow(){
     </td>
     <td class="no-print"><button class="btn-danger-sm" onclick="this.closest('tr').remove();calculate();markUnsaved();">×</button></td>`;
   tbody.appendChild(tr);
+}
+
+function updateSupplierPrint(textarea){
+  const div=textarea.nextElementSibling;
+  if(div&&div.classList.contains('supplier-print'))div.innerText=textarea.value;
 }
 
 function handleSupplierKey(e){
