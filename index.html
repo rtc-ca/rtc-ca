@@ -836,10 +836,13 @@ function collectCurrentData(){
         brows.push({item:tr.querySelector('.bd-item')?.value||'',qty:tr.querySelector('.bd-qty')?.value||'',unit:tr.querySelector('.bd-unit')?.value||''});
       });
       const card=tbody.closest('.breakdown-card');
-      const ewtInputs=card?card.querySelectorAll('.breakdown-ewt-row input[type="text"]'):[];
+      const ewtUnitInputs=card?card.querySelectorAll('.bd-ewt-unit'):[];
+      const ewtTotalInputs=card?card.querySelectorAll('.bd-ewt'):[];
       const notesTA=card?card.querySelector('.bd-notes'):null;
       const notesRow=card?card.querySelector('.breakdown-notes-row'):null;
-      sections.push({rows:brows,ewt1:ewtInputs[0]?.value||'',ewtV1:ewtInputs[1]?.value||'',
+      sections.push({rows:brows,
+        ewt1unit:ewtUnitInputs[0]?.value||'',ewt1:ewtTotalInputs[0]?.value||'',
+        ewtV1unit:ewtUnitInputs[1]?.value||'',ewtV1:ewtTotalInputs[1]?.value||'',
         notes:notesTA?.value||'',notesVisible:notesRow?notesRow.style.display!=='none':false});
     });
     return sections;
@@ -925,8 +928,12 @@ function loadDataIntoUI(data){
       if(tr.querySelector('.bd-unit'))tr.querySelector('.bd-unit').value=r.unit||'';
     });
     const card=tbody.closest('.breakdown-card');
-    const ei=card?card.querySelectorAll('.breakdown-ewt-row input[type="text"]'):[];
-    if(ei[0])ei[0].value=sec.ewt1||'';if(ei[1])ei[1].value=sec.ewtV1||'';
+    const ewtUnit=card?card.querySelectorAll('.bd-ewt-unit'):[];
+    const ewtTotal=card?card.querySelectorAll('.bd-ewt'):[];
+    if(ewtUnit[0]){ewtUnit[0].value=sec.ewt1unit||'';autoResize(ewtUnit[0]);}
+    if(ewtTotal[0])ewtTotal[0].value=sec.ewt1||'';
+    if(ewtUnit[1]){ewtUnit[1].value=sec.ewtV1unit||'';autoResize(ewtUnit[1]);}
+    if(ewtTotal[1])ewtTotal[1].value=sec.ewtV1||'';
     if(sec.notesVisible&&sec.notes){
       const notesRow=card?.querySelector('.breakdown-notes-row');
       const notesTA=card?.querySelector('.bd-notes');
@@ -951,8 +958,12 @@ function loadDataIntoUI(data){
       if(tr.querySelector('.bd-unit'))tr.querySelector('.bd-unit').value=r.unit||'';
     });
     const card=tbody.closest('.breakdown-card');
-    const ei=card?card.querySelectorAll('.breakdown-ewt-row input[type="text"]'):[];
-    if(ei[0])ei[0].value=sec.ewt1||'';if(ei[1])ei[1].value=sec.ewtV1||'';
+    const ewtUnit=card?card.querySelectorAll('.bd-ewt-unit'):[];
+    const ewtTotal=card?card.querySelectorAll('.bd-ewt'):[];
+    if(ewtUnit[0]){ewtUnit[0].value=sec.ewt1unit||'';autoResize(ewtUnit[0]);}
+    if(ewtTotal[0])ewtTotal[0].value=sec.ewt1||'';
+    if(ewtUnit[1]){ewtUnit[1].value=sec.ewtV1unit||'';autoResize(ewtUnit[1]);}
+    if(ewtTotal[1])ewtTotal[1].value=sec.ewtV1||'';
     if(sec.notesVisible&&sec.notes){
       const notesRow=card?.querySelector('.breakdown-notes-row');
       const notesTA=card?.querySelector('.bd-notes');
@@ -1215,17 +1226,23 @@ function addBreakdownSection(type){
           <thead><tr><th style="width:42%">Item</th><th>Qty</th><th>Unit Cost</th><th>Total</th><th class="no-print"></th></tr></thead>
           <tbody id="${bodyId}"></tbody>
           <tfoot>
-            <tr class="breakdown-ewt-row"><td colspan="2">NON-VAT EWT ${ewtPct} (Assumed by RTC)</td><td></td>
-              <td><input type="text" style="border:none;border-bottom:1px solid #fca5a5;width:100%;font-size:.72rem;background:transparent;padding:2px 4px;color:#c0392b;font-style:italic;" placeholder="—"></td>
+            <tr class="breakdown-ewt-row"><td colspan="2">NON-VAT EWT ${ewtPct} (Assumed by RTC)</td>
+              <td><textarea class="bd-ewt-unit" rows="1" placeholder="—"
+                oninput="autoResize(this);calcBreakdown('${type}');markUnsaved()"
+                style="border:none;border-bottom:1px solid #fca5a5;width:100%;font-size:.72rem;background:transparent;padding:2px 4px;color:#c0392b;font-style:italic;text-align:center;outline:none;resize:none;overflow:hidden;font-family:inherit;line-height:1.4;min-height:24px;display:block;"></textarea></td>
+              <td><input type="text" class="bd-ewt" style="border:none;border-bottom:1px solid #fca5a5;width:100%;font-size:.72rem;background:transparent;padding:2px 4px;color:#c0392b;font-style:italic;outline:none;" placeholder="—" oninput="calcBreakdown('${type}');markUnsaved()"></td>
               <td class="no-print"></td></tr>
-            <tr class="breakdown-ewt-row"><td colspan="2">VATABLE EWT ${ewtPct} (Assumed by RTC)</td><td></td>
-              <td><input type="text" style="border:none;border-bottom:1px solid #fca5a5;width:100%;font-size:.72rem;background:transparent;padding:2px 4px;color:#c0392b;font-style:italic;" placeholder="—"></td>
+            <tr class="breakdown-ewt-row"><td colspan="2">VATABLE EWT ${ewtPct} (Assumed by RTC)</td>
+              <td><textarea class="bd-ewt-unit" rows="1" placeholder="—"
+                oninput="autoResize(this);calcBreakdown('${type}');markUnsaved()"
+                style="border:none;border-bottom:1px solid #fca5a5;width:100%;font-size:.72rem;background:transparent;padding:2px 4px;color:#c0392b;font-style:italic;text-align:center;outline:none;resize:none;overflow:hidden;font-family:inherit;line-height:1.4;min-height:24px;display:block;"></textarea></td>
+              <td><input type="text" class="bd-ewt" style="border:none;border-bottom:1px solid #fca5a5;width:100%;font-size:.72rem;background:transparent;padding:2px 4px;color:#c0392b;font-style:italic;outline:none;" placeholder="—" oninput="calcBreakdown('${type}');markUnsaved()"></td>
               <td class="no-print"></td></tr>
             <tr class="breakdown-total-row">
               <td>Total :</td>
-              <td id="${type}TotalQty_${count}" style="text-align:center;"></td>
+              <td id="${type}TotalQty_${count}" style="text-align:center;color:#166534;font-weight:700;"></td>
               <td></td>
-              <td id="${type}TotalCost_${count}"></td>
+              <td id="${type}TotalCost_${count}" style="color:#166534;font-weight:700;"></td>
               <td class="no-print"></td></tr>
             <tr class="breakdown-notes-row" id="${type}NotesRow_${count}" style="display:none;">
               <td colspan="4" style="padding:4px 6px;">
@@ -1265,6 +1282,14 @@ function calcBreakdown(type){
       if(row.querySelector('.bd-total'))row.querySelector('.bd-total').value=t?peso(t):'';
       tQty+=q;tCost+=t;
     });
+    // Add EWT values to total
+    const card=tbody.closest('.breakdown-card');
+    if(card){
+      card.querySelectorAll('.bd-ewt').forEach(input=>{
+        const val=parseFloat(input.value.replace(/[₱,]/g,''))||0;
+        tCost+=val;
+      });
+    }
     const tQEl=document.getElementById(`${type}TotalQty_${count}`);
     const tCEl=document.getElementById(`${type}TotalCost_${count}`);
     if(tQEl)tQEl.innerText=tQty||'';
